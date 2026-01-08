@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .profile-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 100px auto 50px;
             padding: 20px;
         }
@@ -27,68 +27,185 @@
             font-weight: 900;
         }
 
-        .profile-header p {
-            margin: 0;
-            opacity: 0.9;
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
         }
 
-        .actions-section {
+        .quick-actions {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             padding: 30px;
-            margin-bottom: 30px;
             backdrop-filter: blur(12px);
         }
 
-        .actions-section h2 {
-            margin-top: 0;
+        .quick-actions h2 {
             color: #38bdf8;
-            font-size: 1.8em;
-            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5em;
         }
 
-        .action-buttons {
+        .action-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            gap: 15px;
         }
 
         .action-card {
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
-            color: #020617;
-            padding: 30px;
-            border-radius: 16px;
-            text-align: center;
-            cursor: pointer;
+            background: rgba(2, 6, 23, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.3s;
+            cursor: pointer;
             text-decoration: none;
             display: block;
+            color: inherit;
         }
 
         .action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4);
-        }
-
-        .action-card-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
+            border-color: #38bdf8;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(56, 189, 248, 0.2);
         }
 
         .action-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 1.5em;
-            font-weight: 800;
+            margin: 0 0 8px 0;
+            color: #38bdf8;
+            font-size: 1.2em;
         }
 
         .action-card p {
             margin: 0;
-            opacity: 0.9;
-            font-size: 0.95em;
+            color: #94a3b8;
+            font-size: 0.9em;
         }
 
+        /* Виджет последней переписки */
+        .last-chat-widget {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(12px);
+        }
+
+        .last-chat-widget h2 {
+            color: #38bdf8;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .widget-chat-preview {
+            background: rgba(2, 6, 23, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .widget-chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .widget-chat-service {
+            color: #38bdf8;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .widget-status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .widget-status-waiting {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .widget-status-in_progress {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .widget-last-message {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #38bdf8;
+            margin-bottom: 12px;
+        }
+
+        .widget-last-message-text {
+            color: #cbd5f5;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+
+        .widget-last-message-time {
+            color: #64748b;
+            font-size: 0.8em;
+        }
+
+        .widget-chat-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            color: #020617;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .widget-chat-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .widget-empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .widget-empty-state p {
+            margin: 10px 0;
+        }
+
+        .widget-create-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            color: #020617;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .widget-create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Список обсуждений */
         .discussions-section {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -98,45 +215,42 @@
         }
 
         .discussions-section h2 {
-            margin-top: 0;
             color: #38bdf8;
-            font-size: 1.8em;
-            margin-bottom: 25px;
-            font-weight: 800;
-        }
-
-        .discussion-item {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
+            margin-top: 0;
             margin-bottom: 20px;
-            transition: all 0.3s;
-            background: rgba(2, 6, 23, 0.4);
+            font-size: 1.8em;
         }
 
-        .discussion-item:hover {
+        .discussion-card {
+            background: rgba(2, 6, 23, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .discussion-card:hover {
             border-color: #38bdf8;
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
-            transform: translateY(-4px);
+            transform: translateY(-3px);
         }
 
         .discussion-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
-        .discussion-title {
-            font-size: 1.3em;
-            font-weight: 700;
+        .discussion-service {
             color: #e5e7eb;
-            margin: 0;
+            font-weight: 700;
+            font-size: 1.1em;
         }
 
         .status-badge {
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 15px;
             font-size: 0.85em;
             font-weight: 600;
         }
@@ -159,58 +273,51 @@
             border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
-        .discussion-info {
-            color: #94a3b8;
-            font-size: 0.95em;
-            margin-bottom: 15px;
-        }
-
-        .open-chat-btn {
+        .discussion-link {
             display: inline-block;
-            padding: 10px 20px;
+            margin-top: 10px;
+            padding: 8px 16px;
             background: linear-gradient(90deg, #38bdf8, #818cf8);
             color: #020617;
             text-decoration: none;
-            border-radius: 10px;
-            font-weight: 700;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
             transition: all 0.3s;
         }
 
-        .open-chat-btn:hover {
+        .discussion-link:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 3px 12px rgba(56, 189, 248, 0.3);
         }
 
-        .empty-state {
+        .empty-discussions {
             text-align: center;
             padding: 60px 20px;
             color: #64748b;
         }
 
-        .empty-state svg {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        .logout-btn {
-            display: block;
-            width: fit-content;
-            margin: 30px auto 0;
-            padding: 12px 30px;
-            background: rgba(239, 68, 68, 0.8);
-            color: white;
+        .empty-discussions a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 14px 28px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            color: #020617;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-weight: 700;
             transition: all 0.3s;
         }
 
-        .logout-btn:hover {
-            background: rgba(239, 68, 68, 1);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+        .empty-discussions a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(56, 189, 248, 0.4);
+        }
+
+        @media (max-width: 968px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -240,37 +347,82 @@
     <div class="profile-container">
         <div class="profile-header">
             <h1>👤 Личный кабинет</h1>
-            <p>Управляйте своими проектами и обсуждениями</p>
+            <p>Добро пожаловать! Управляйте своими проектами и общайтесь с нашей командой</p>
         </div>
 
-        <div class="actions-section">
-            <h2>🚀 Быстрые действия</h2>
-            <div class="action-buttons">
-                <a href="/discussions" class="action-card">
-                    <div class="action-card-icon">💬</div>
-                    <h3>Новое обсуждение</h3>
-                    <p>Начать разговор о новом проекте</p>
-                </a>
+        <div class="profile-grid">
+            <!-- Быстрые действия -->
+            <div class="quick-actions">
+                <h2>⚡ Быстрые действия</h2>
+                <div class="action-cards">
+                    <a href="/discussions" class="action-card">
+                        <h3>💬 Новое обсуждение</h3>
+                        <p>Создать новый проект или задать вопрос</p>
+                    </a>
+                    <a href="/services" class="action-card">
+                        <h3>📋 Наши услуги</h3>
+                        <p>Посмотреть все доступные услуги</p>
+                    </a>
+                </div>
+            </div>
 
-                <a href="/services" class="action-card">
-                    <div class="action-card-icon">🛠️</div>
-                    <h3>Наши услуги</h3>
-                    <p>Посмотреть все доступные услуги</p>
-                </a>
+            <!-- Виджет последней переписки -->
+            <div class="last-chat-widget">
+                <h2>💭 Последняя переписка</h2>
+
+                {% if chats %}
+                {% set last_chat = chats[0] %}
+                <div class="widget-chat-preview">
+                    <div class="widget-chat-header">
+                        <span class="widget-chat-service">📌 {{ last_chat['service_name'] }}</span>
+                        <span class="widget-status-badge widget-status-{{ last_chat['status'] }}">
+                            {% if last_chat['status'] == 'waiting' %}
+                            ⏳ Ожидает
+                            {% elif last_chat['status'] == 'in_progress' %}
+                            🔄 В процессе
+                            {% else %}
+                            ✅ Завершено
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="widget-last-message">
+                        <div class="widget-last-message-text">
+                            Последнее сообщение в этом обсуждении
+                        </div>
+                        <div class="widget-last-message-time">
+                            📅 {{ last_chat['created_at'] if last_chat['created_at'] else 'Недавно' }}
+                        </div>
+                    </div>
+
+                    <a href="/chat/{{ last_chat['id'] }}" class="widget-chat-link">
+                        Продолжить диалог →
+                    </a>
+                </div>
+                {% else %}
+                <div class="widget-empty-state">
+                    <p>💬 У вас пока нет активных обсуждений</p>
+                    <p style="font-size: 0.9em;">Создайте первое обсуждение, чтобы начать работу с нами!</p>
+                    <a href="/discussions" class="widget-create-btn">
+                        Создать обсуждение
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
 
+        <!-- Все обсуждения -->
         <div class="discussions-section">
             <h2>📋 Мои обсуждения</h2>
 
             {% if chats %}
             {% for chat in chats %}
-            <div class="discussion-item">
+            <div class="discussion-card">
                 <div class="discussion-header">
-                    <h3 class="discussion-title">{{ chat['service_name'] }}</h3>
+                    <span class="discussion-service">📌 {{ chat['service_name'] }}</span>
                     <span class="status-badge status-{{ chat['status'] }}">
                         {% if chat['status'] == 'waiting' %}
-                        ⏳ Ожидает ответа
+                        ⏳ Ожидает
                         {% elif chat['status'] == 'in_progress' %}
                         🔄 В процессе
                         {% else %}
@@ -278,32 +430,29 @@
                         {% endif %}
                     </span>
                 </div>
-
-                <div class="discussion-info">
-                    📅 Создано: {{ chat['created_at'] if chat['created_at'] else 'недавно' }}
-                </div>
-
-                <a href="/chat/{{ chat['id'] }}" class="open-chat-btn">
+                <a href="/chat/{{ chat['id'] }}" class="discussion-link">
                     Открыть чат →
                 </a>
             </div>
             {% endfor %}
             {% else %}
-            <div class="empty-state">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-                <h3>У вас пока нет обсуждений</h3>
-                <p>Создайте первое обсуждение, чтобы начать работу над проектом</p>
-                <a href="/discussions" class="open-chat-btn" style="margin-top: 20px;">
-                    Создать обсуждение
-                </a>
+            <div class="empty-discussions">
+                <h3>📭 У вас пока нет обсуждений</h3>
+                <p>Создайте своё первое обсуждение, чтобы начать работу над проектом!</p>
+                <a href="/discussions">Создать обсуждение</a>
             </div>
             {% endif %}
         </div>
 
-        <a href="/logout" class="logout-btn">Выйти из аккаунта</a>
+        <!-- Кнопка выхода -->
+        <div style="text-align: center; margin-top: 40px; padding: 20px 0;">
+            <a href="/logout"
+                style="display: inline-block; padding: 14px 40px; background: linear-gradient(90deg, #ef4444, #dc2626); color: white; text-decoration: none; border-radius: 12px; font-weight: 700; transition: all 0.3s; box-shadow: 0 4px 16px rgba(239,68,68,0.3);"
+                onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 24px rgba(239,68,68,0.5)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(239,68,68,0.3)'">
+                🚪 Выйти из аккаунта
+            </a>
+        </div>
     </div>
 
     <footer class="footer">
@@ -311,8 +460,7 @@
             <div class="footer-section">
                 <h4>Контакты</h4>
                 <p>Телефон: +38 095 713 66 14</p>
-                <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
-                        data-cfemail="9bf2efeca9a8a9adaedbfcf6faf2f7b5f8f4f6">[email&#160;protected]</a></p>
+                <p>Email: itw23265@gmail.com</p>
             </div>
 
             <div class="footer-section">
@@ -327,4 +475,11 @@
             </div>
         </div>
 
-        <div class
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
+        </div>
+    </footer>
+
+</body>
+
+</html>

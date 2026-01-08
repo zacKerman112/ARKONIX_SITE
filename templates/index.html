@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>ARKONIX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARKONIX - Разработка веб-приложений и AI-решений</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
@@ -15,7 +16,13 @@
                 ARKONIX
             </div>
 
-            <nav class="nav">
+            <div class="burger-menu" id="burgerMenu">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </div>
+
+            <nav class="nav" id="nav">
                 <a href="{{ url_for('main') }}">Главная</a>
                 <a href="{{ url_for('services') }}">Услуги</a>
                 <a href="{{ url_for('team') }}">Команда</a>
@@ -24,7 +31,7 @@
                 {% endif %}
             </nav>
 
-            <div class="user-panel">
+            <div class="user-panel" id="userPanel">
                 {% if session.user_id %}
                 <a href="{{ url_for('profile') }}">Личный кабинет</a>
                 <a href="{{ url_for('logout') }}">Выход</a>
@@ -34,6 +41,7 @@
                 {% endif %}
             </div>
         </div>
+        <div class="menu-overlay" id="menuOverlay"></div>
     </header>
 
     <section class="welcome">
@@ -53,13 +61,11 @@
 
     <section class="about">
         <div class="container">
-
             <h2>О нас</h2>
             <p>
                 ARKONIX — это независимая команда IT-разработчиков, создающая современные цифровые продукты для бизнеса,
                 стартапов и частных клиентов. Мы объединяем технологии, креатив и инженерное мышление, чтобы превращать
-                идеи
-                в надёжные, масштабируемые и эффективные решения.
+                идеи в надёжные, масштабируемые и эффективные решения.
             </p>
 
             <p>
@@ -73,8 +79,7 @@
             <p>
                 Наша миссия — создавать технологии, которые упрощают жизнь, автоматизируют процессы и помогают клиентам
                 развиваться быстрее. Мы стремимся разрабатывать продукты, которые выглядят современно, работают
-                стабильно и
-                легко масштабируются под будущие задачи.
+                стабильно и легко масштабируются под будущие задачи.
             </p>
 
             <p>
@@ -102,8 +107,7 @@
             <h3>Подход к работе</h3>
             <p>
                 Каждый проект начинается с детального анализа задачи. Мы изучаем цели, аудиторию и требования, после
-                чего
-                предлагаем оптимальную архитектуру и поэтапный план реализации.
+                чего предлагаем оптимальную архитектуру и поэтапный план реализации.
             </p>
 
             <h3>Почему ARKONIX</h3>
@@ -127,36 +131,29 @@
                 Если вы ищете команду, которая думает на шаг вперёд, ценит качество и умеет работать с технологиями —
                 ARKONIX готов стать вашим технологическим партнёром.
             </p>
-
         </div>
     </section>
-
 
     <section class="achievements">
         <div class="container">
             <h2>Наши достижения</h2>
             <div class="achievements-grid">
-
                 <div class="achievement-card">
                     <h3>150+</h3>
                     <p>Telegram-ботов</p>
                 </div>
-
                 <div class="achievement-card">
                     <h3>75+</h3>
                     <p>AI-решений</p>
                 </div>
-
                 <div class="achievement-card">
                     <h3>120+</h3>
                     <p>Приложений</p>
                 </div>
-
                 <div class="achievement-card">
                     <h3>200+</h3>
                     <p>Сайтов</p>
                 </div>
-
             </div>
         </div>
     </section>
@@ -164,7 +161,6 @@
     <section class="reviews">
         <div class="container">
             <h2>Отзывы клиентов</h2>
-
             {% for r in reviews %}
             <div class="review-card">
                 <h4>{{ r[0] }}</h4>
@@ -182,16 +178,12 @@
         </div>
     </section>
 
-
     <section class="add-review">
         <div class="container add-review-grid">
-
-            <!-- Форма отзыва -->
             <div class="review-form">
                 <h2>Оставить отзыв</h2>
                 <form method="post" action="{{ url_for('add_review') }}">
                     <input name="name" placeholder="Имя" required>
-
                     <select name="rating" required>
                         <option value="">Оценка</option>
                         <option value="5">⭐⭐⭐⭐⭐</option>
@@ -200,32 +192,27 @@
                         <option value="2">⭐⭐</option>
                         <option value="1">⭐</option>
                     </select>
-
                     <textarea name="comment" placeholder="Ваш отзыв" required></textarea>
                     <button type="submit">Отправить</button>
                 </form>
             </div>
 
-            <!-- Документ о компании -->
             <div class="about-document">
                 <div class="doc-header">
                     <span class="doc-icon">📄</span>
                     <h3>ARKONIX</h3>
                     <span class="doc-subtitle">IT Development & Automation</span>
                 </div>
-
                 <div class="doc-body">
                     <p>
                         ARKONIX — независимая команда IT-разработчиков,
                         создающая надёжные цифровые решения для бизнеса,
                         стартапов и частных клиентов.
                     </p>
-
                     <p>
                         Мы работаем по принципу полного цикла:
                         анализ → архитектура → разработка → тестирование → поддержка.
                     </p>
-
                     <ul>
                         <li>✔ Индивидуальный подход</li>
                         <li>✔ Современный стек технологий</li>
@@ -233,16 +220,13 @@
                         <li>✔ Долгосрочное сотрудничество</li>
                     </ul>
                 </div>
-
                 <div class="doc-footer">
                     <span>ARKONIX © 2025</span>
                     <span class="doc-sign">Digital Signature</span>
                 </div>
             </div>
-
         </div>
     </section>
-
 
     <footer class="footer">
         <div class="container footer-container">
@@ -251,24 +235,56 @@
                 <p>Телефон: +38 095 713 66 14</p>
                 <p>Email: itw23265@gmail.com</p>
             </div>
-
             <div class="footer-section">
                 <h4>Соцсети</h4>
                 <a href="https://t.me/worldit23">Telegram</a><br>
                 <a href="https://discord.gg/uKzRMmshnp">Discord</a>
             </div>
-
             <div class="footer-section">
                 <a href="{{ url_for('terms') }}">Условия использования</a>
                 <a href="{{ url_for('privacy') }}">Политика и правила</a>
             </div>
         </div>
-
         <div class="footer-bottom">
             &copy; 2025 ARKONIX. Все права защищены.
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const burgerMenu = document.getElementById('burgerMenu');
+            const nav = document.getElementById('nav');
+            const userPanel = document.getElementById('userPanel');
+            const menuOverlay = document.getElementById('menuOverlay');
+
+            if (!burgerMenu) return;
+
+            function toggleMenu() {
+                burgerMenu.classList.toggle('active');
+                nav.classList.toggle('active');
+                if (userPanel) userPanel.classList.toggle('active');
+                menuOverlay.classList.toggle('active');
+                document.body.style.overflow = burgerMenu.classList.contains('active') ? 'hidden' : '';
+            }
+
+            burgerMenu.addEventListener('click', toggleMenu);
+            menuOverlay.addEventListener('click', toggleMenu);
+
+            nav.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 968) {
+                        toggleMenu();
+                    }
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 968 && burgerMenu.classList.contains('active')) {
+                    toggleMenu();
+                }
+            });
+        });
+    </script>
 
 </body>
 

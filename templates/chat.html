@@ -8,7 +8,7 @@
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
         .chat-container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 100px auto 50px;
             padding: 20px;
             height: calc(100vh - 200px);
@@ -17,179 +17,343 @@
         }
 
         .chat-header {
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
             color: #020617;
-            padding: 20px 30px;
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+            padding: 25px 35px;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 5px 40px rgba(56, 189, 248, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.2), transparent 70%);
+            opacity: 0.3;
+        }
+
+        .chat-header-content {
+            position: relative;
+            z-index: 1;
         }
 
         .chat-header h2 {
-            margin: 0;
-            font-size: 1.5em;
+            margin: 0 0 8px 0;
+            font-size: 1.8em;
             font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.5em;
+            background: rgba(34, 197, 94, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         .chat-header p {
-            margin: 5px 0 0 0;
+            margin: 0;
             opacity: 0.9;
-            font-size: 0.9em;
+            font-size: 0.95em;
         }
 
         .chat-messages {
             flex: 1;
-            background: rgba(15, 23, 42, 0.6);
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.4), rgba(2, 6, 23, 0.6));
             padding: 30px;
             overflow-y: auto;
-            border-left: 1px solid rgba(255, 255, 255, 0.08);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .message {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             display: flex;
-            animation: slideIn 0.3s ease;
+            gap: 12px;
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px) scale(0.95);
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
-        .message-content {
-            max-width: 70%;
-            padding: 15px 20px;
-            border-radius: 15px;
-            word-wrap: break-word;
-            position: relative;
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            flex-shrink: 0;
         }
 
         .message.my-message {
-            justify-content: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.my-message .message-avatar {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: #020617;
+        }
+
+        .message.other-message .message-avatar {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: white;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 65%;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+        }
+
+        .message.my-message .message-header {
+            flex-direction: row-reverse;
+        }
+
+        .message-sender {
+            font-weight: 700;
+            color: #cbd5f5;
+        }
+
+        .message-time {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .message-content {
+            padding: 16px 20px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            position: relative;
+            line-height: 1.5;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
         }
 
         .message.my-message .message-content {
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
             color: #020617;
-            border-radius: 15px 15px 0 15px;
+            border-radius: 18px 18px 4px 18px;
             font-weight: 500;
         }
 
         .message.other-message .message-content {
-            background: rgba(2, 6, 23, 0.8);
+            background: rgba(30, 41, 59, 0.8);
             color: #e5e7eb;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px 15px 15px 0;
+            border-radius: 18px 18px 18px 4px;
+            backdrop-filter: blur(10px);
         }
 
-        .message-info {
-            font-size: 0.75em;
-            opacity: 0.8;
-            margin-top: 5px;
+        .message-content::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+        }
+
+        .message.my-message .message-content::before {
+            right: -6px;
+            border-left-color: #818cf8;
+            border-bottom: none;
+        }
+
+        .message.other-message .message-content::before {
+            left: -6px;
+            border-right-color: rgba(30, 41, 59, 0.8);
+            border-bottom: none;
         }
 
         .chat-input-area {
-            background: rgba(15, 23, 42, 0.8);
-            padding: 20px 30px;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 -5px 15px rgba(56, 189, 248, 0.1);
+            background: rgba(15, 23, 42, 0.9);
+            padding: 24px 35px;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 -5px 30px rgba(56, 189, 248, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-top: 2px solid #38bdf8;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
         }
 
         .chat-input-form {
             display: flex;
-            gap: 15px;
+            gap: 12px;
+            align-items: center;
         }
 
         .chat-input {
             flex: 1;
-            padding: 15px 20px;
-            background: rgba(2, 6, 23, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 24px;
+            background: rgba(2, 6, 23, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             color: #e5e7eb;
-            border-radius: 25px;
+            border-radius: 28px;
             font-size: 1em;
             transition: all 0.3s;
+            font-family: inherit;
         }
 
         .chat-input:focus {
             outline: none;
             border-color: #38bdf8;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+            background: rgba(2, 6, 23, 0.8);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+        }
+
+        .chat-input::placeholder {
+            color: #64748b;
         }
 
         .send-btn {
-            padding: 15px 30px;
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
             color: #020617;
             border: none;
-            border-radius: 25px;
+            border-radius: 28px;
             font-weight: 700;
+            font-size: 1em;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3);
         }
 
         .send-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 24px rgba(56, 189, 248, 0.5);
         }
 
         .send-btn:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
 
         .back-link {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 20px;
             color: #38bdf8;
             text-decoration: none;
             font-weight: 600;
-            transition: color 0.3s;
+            transition: all 0.3s;
+            padding: 8px 16px;
+            border-radius: 12px;
         }
 
         .back-link:hover {
+            background: rgba(56, 189, 248, 0.1);
             color: #818cf8;
-            text-decoration: underline;
         }
 
         .empty-chat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
             text-align: center;
             padding: 60px 20px;
             color: #64748b;
         }
 
-        .empty-chat svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.3;
+        .empty-chat-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
         }
 
-        /* Стили для скроллбара */
+        .empty-chat svg {
+            width: 60px;
+            height: 60px;
+            opacity: 0.4;
+        }
+
+        .empty-chat h3 {
+            color: #cbd5f5;
+            margin-bottom: 8px;
+        }
+
         .chat-messages::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
         .chat-messages::-webkit-scrollbar-track {
             background: rgba(2, 6, 23, 0.4);
+            border-radius: 10px;
         }
 
         .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(56, 189, 248, 0.3);
-            border-radius: 4px;
+            background: linear-gradient(180deg, #38bdf8, #818cf8);
+            border-radius: 10px;
         }
 
         .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: rgba(56, 189, 248, 0.5);
+            background: linear-gradient(180deg, #818cf8, #38bdf8);
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                margin: 80px 10px 20px;
+                height: calc(100vh - 120px);
+            }
+
+            .message-wrapper {
+                max-width: 80%;
+            }
         }
     </style>
 </head>
@@ -202,76 +366,148 @@
                 <a href="/" style="color: inherit; text-decoration: none;">ARKONIX</a>
             </div>
 
-            <nav class="nav">
+            <div class="burger-menu" id="burgerMenu">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </div>
+
+            <nav class="nav" id="nav">
                 <a href="/">Главная</a>
                 <a href="/services">Услуги</a>
                 <a href="/team">Команда</a>
+                {% if session.user_id and session.role == 'client' %}
+                <a href="/discussions">Обсуждения</a>
+                {% endif %}
             </nav>
 
-            <div class="user-panel">
+            <div class="user-panel" id="userPanel">
                 <a href="/profile">Личный кабинет</a>
                 <a href="/logout">Выход</a>
             </div>
         </div>
+        <div class="menu-overlay" id="menuOverlay"></div>
     </header>
 
+    <!-- Скрытый элемент с данными -->
+    <div id="chatData" data-chat-id="{{ chat_id }}" data-user-id="{{ user_id }}" style="display: none;"></div>
+
     <div class="chat-container">
-        <a href="/profile" class="back-link">← Вернуться назад</a>
+        <a href="/profile" class="back-link">
+            ← Вернуться назад
+        </a>
 
         <div class="chat-header">
-            <h2>💬 Обсуждение проекта</h2>
-            <p>Общайтесь с нашей командой в режиме реального времени</p>
+            <div class="chat-header-content">
+                <h2>
+                    💬 Обсуждение проекта
+                    <span class="chat-status">
+                        <span class="status-dot"></span>
+                        Онлайн
+                    </span>
+                </h2>
+                <p>Общайтесь с нашей командой в режиме реального времени</p>
+            </div>
         </div>
 
         <div class="chat-messages" id="messages">
             {% if messages %}
             {% for msg in messages %}
             <div class="message {% if msg['sender_id'] == user_id %}my-message{% else %}other-message{% endif %}">
-                <div class="message-content">
-                    {{ msg['text'] }}
-                    <div class="message-info">
-                        {% if msg['sender_id'] == user_id %}
-                        Вы
-                        {% else %}
-                        Поддержка
-                        {% endif %}
+                <div class="message-avatar">
+                    {% if msg['sender_id'] == user_id %}
+                    {{ session.get('username', 'Вы')[0]|upper }}
+                    {% else %}
+                    A
+                    {% endif %}
+                </div>
+                <div class="message-wrapper">
+                    <div class="message-header">
+                        <span class="message-sender">
+                            {% if msg['sender_id'] == user_id %}
+                            Вы
+                            {% else %}
+                            Поддержка ARKONIX
+                            {% endif %}
+                        </span>
+                        <span class="message-time">только что</span>
+                    </div>
+                    <div class="message-content">
+                        {{ msg['text'] }}
                     </div>
                 </div>
             </div>
             {% endfor %}
             {% else %}
             <div class="empty-chat">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
+                <div class="empty-chat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
                 <h3>Начните общение</h3>
-                <p>Отправьте первое сообщение, чтобы начать обсуждение</p>
+                <p>Отправьте первое сообщение, чтобы начать обсуждение вашего проекта</p>
             </div>
             {% endif %}
         </div>
 
         <div class="chat-input-area">
             <form class="chat-input-form" id="messageForm">
-                <input type="text" class="chat-input" id="messageInput" placeholder="Введите сообщение..."
+                <input type="text" class="chat-input" id="messageInput" placeholder="Напишите сообщение..."
                     autocomplete="off" required>
-                <button type="submit" class="send-btn">Отправить</button>
+                <button type="submit" class="send-btn">Отправить →</button>
             </form>
         </div>
     </div>
 
     <script>
+        // Бургер меню
+        document.addEventListener('DOMContentLoaded', function () {
+            const burgerMenu = document.getElementById('burgerMenu');
+            const nav = document.getElementById('nav');
+            const userPanel = document.getElementById('userPanel');
+            const menuOverlay = document.getElementById('menuOverlay');
+
+            if (burgerMenu) {
+                function toggleMenu() {
+                    burgerMenu.classList.toggle('active');
+                    nav.classList.toggle('active');
+                    if (userPanel) userPanel.classList.toggle('active');
+                    menuOverlay.classList.toggle('active');
+                    document.body.style.overflow = burgerMenu.classList.contains('active') ? 'hidden' : '';
+                }
+
+                burgerMenu.addEventListener('click', toggleMenu);
+                menuOverlay.addEventListener('click', toggleMenu);
+
+                nav.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth <= 968) {
+                            toggleMenu();
+                        }
+                    });
+                });
+
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 968 && burgerMenu.classList.contains('active')) {
+                        toggleMenu();
+                    }
+                });
+            }
+        });
+
+        // Socket.IO чат - ПОЛУЧАЕМ ДАННЫЕ ИЗ DATA-АТРИБУТОВ
         const socket = io();
-        const chatId = {{ chat_id }};
-        const userId = {{ user_id }};
+        const chatDataEl = document.getElementById('chatData');
+        const chatId = parseInt(chatDataEl.dataset.chatId);
+        const userId = parseInt(chatDataEl.dataset.userId);
         const messagesDiv = document.getElementById("messages");
         const messageForm = document.getElementById("messageForm");
         const messageInput = document.getElementById("messageInput");
 
-        // Подключаемся к комнате чата
         socket.emit("join", { chat_id: chatId });
 
-        // Отправка сообщения
         messageForm.addEventListener("submit", (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
@@ -285,23 +521,25 @@
             }
         });
 
-        // Получение нового сообщения
         socket.on("new_message", (data) => {
             const isMyMessage = data.sender_id === userId;
-
             const messageDiv = document.createElement("div");
             messageDiv.className = `message ${isMyMessage ? 'my-message' : 'other-message'}`;
 
-            messageDiv.innerHTML = `
-            <div class="message-content">
-                ${escapeHtml(data.text)}
-                <div class="message-info">
-                    ${isMyMessage ? 'Вы' : 'Поддержка'}
-                </div>
-            </div>
-        `;
+            const avatarLetter = isMyMessage ? '{{ session.get("username", "Вы")[0]|upper }}' : 'A';
+            const senderName = isMyMessage ? 'Вы' : 'Поддержка ARKONIX';
 
-            // Удаляем пустую заглушку если она есть
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatarLetter}</div>
+                <div class="message-wrapper">
+                    <div class="message-header">
+                        <span class="message-sender">${senderName}</span>
+                        <span class="message-time">только что</span>
+                    </div>
+                    <div class="message-content">${escapeHtml(data.text)}</div>
+                </div>
+            `;
+
             const emptyChat = messagesDiv.querySelector('.empty-chat');
             if (emptyChat) {
                 emptyChat.remove();
@@ -311,17 +549,17 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
 
-        // Экранирование HTML
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        // Прокрутка вниз при загрузке
         window.addEventListener('load', () => {
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
+
+        messageInput.focus();
     </script>
 
 </body>

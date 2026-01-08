@@ -268,7 +268,37 @@ def terms():
 @app.route("/privacy")
 def privacy():
     return render_template("privacy.html")
+# Добавь эти роуты после роута add_review в твой app.py:
 
+
+# ---------- Удалить отзыв (только для админа) ----------
+@app.route("/delete_review/<int:review_id>", methods=["POST"])
+def delete_review(review_id):
+    if "user_id" not in session or session.get("role") not in ["admin", "staff"]:
+        return redirect("/login")
+
+    db = get_db()
+    db.execute("DELETE FROM reviews WHERE id=?", (review_id,))
+    db.commit()
+    db.close()
+
+    flash("Отзыв успешно удалён")
+    return redirect("/admin/reviews")
+
+
+# ---------- Страница управления отзывами (админ) ----------
+@app.route("/admin/reviews")
+def admin_reviews():
+    if "user_id" not in session or session.get("role") not in ["admin", "staff"]:
+        return redirect("/login")
+
+    db = get_db()
+    reviews = db.execute(
+        "SELECT id, user_name, rating, text, created_at FROM reviews ORDER BY id DESC"
+    ).fetchall()
+    db.close()
+
+    return render_template("admin_reviews.html", reviews=reviews)
 
 # ---------- RUN ----------
 if __name__ == "__main__":
