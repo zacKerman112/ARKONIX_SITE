@@ -1,159 +1,171 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <title>Услуги | ARKONIX</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
-<!-- ===== HEADER ===== -->
-<header class="header">
-    <div class="container header-container">
-        <div class="logo">ARKONIX</div>
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">ARKONIX</div>
 
-        <nav class="nav">
-            <a href="{{ url_for('main') }}">Главная</a>
-            <a href="{{ url_for('services') }}">Услуги</a>
-            <a href="{{ url_for('team') }}">Команда</a>
-        </nav>
+            <nav class="nav">
+                <a href="{{ url_for('main') }}">Главная</a>
+                <a href="{{ url_for('services') }}">Услуги</a>
+                <a href="{{ url_for('team') }}">Команда</a>
+                {% if session.user_id %}
+                <a href="/discussions">Обсуждения</a>
+                {% endif %}
+            </nav>
 
-        <div class="user-panel">
-            <a href="{{ url_for('profile') }}">Личный кабинет</a>
+            <div class="user-panel">
+                {% if session.user_id %}
+                {% if session.role in ['admin', 'staff'] %}
+                <a href="{{ url_for('profile') }}">Админ-панель</a>
+                {% else %}
+                <a href="{{ url_for('profile') }}">Личный кабинет</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Выход</a>
+                {% else %}
+                <a href="{{ url_for('login') }}">Войти</a>
+                <a href="{{ url_for('register') }}">Регистрация</a>
+                {% endif %}
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<!-- ===== SERVICES HERO ===== -->
-<section class="services-hero">
-    <div class="container">
-        <h1>Наши услуги</h1>
-        <p>Полный цикл IT-разработки — от идеи до запуска и поддержки</p>
-    </div>
-</section>
+    <section class="services-hero">
+        <div class="container">
+            <h1>Наши услуги</h1>
+            <p>Полный цикл IT-разработки — от идеи до запуска и поддержки</p>
+        </div>
+    </section>
 
-<!-- ===== SERVICES ===== -->
-<section class="services">
-    <div class="container services-grid">
+    <section class="services">
+        <div class="container services-grid">
 
-        <!-- SERVICE 1 -->
-        <div class="service-card">
-            <h3>🖥 Разработка сайтов</h3>
-            <p class="subtitle">Лендинги · Корпоративные сайты · Интернет-магазины</p>
-            <p>Современные сайты, которые работают на результат.</p>
+            <div class="service-card">
+                <h3>🖥 Разработка сайтов</h3>
+                <p class="subtitle">Лендинги · Корпоративные сайты · Интернет-магазины</p>
+                <p>Современные сайты, которые работают на результат.</p>
 
-            <ul class="service-list">
-                <li>Индивидуальный дизайн</li>
-                <li>Адаптация под все устройства</li>
-                <li>Высокая скорость загрузки</li>
-                <li>Формы заявок</li>
-                <li>SEO-оптимизация</li>
-            </ul>
+                <ul class="service-list">
+                    <li>Индивидуальный дизайн</li>
+                    <li>Адаптация под все устройства</li>
+                    <li>Высокая скорость загрузки</li>
+                    <li>Формы заявок</li>
+                    <li>SEO-оптимизация</li>
+                </ul>
 
-            <p class="price">💰 от 130 $</p>
-            <p class="time">⏱ 3–7 дней</p>
+                <p class="price">💰 от 130 $</p>
+                <p class="time">⏱ 3–7 дней</p>
 
-            <form action="{{ url_for('create_chat') }}" method="post">
-                <input type="hidden" name="service" value="Разработка сайтов">
-                <button type="submit" class="btn-primary">Обсудить</button>
-            </form>
+                {% if session.user_id and session.role == 'client' %}
+                <a href="{{ url_for('discussions', service='Разработка сайтов') }}" class="btn-primary">Обсудить</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn-primary">Обсудить</a>
+                {% endif %}
+            </div>
+
+            <div class="service-card">
+                <h3>🌐 Веб-приложения</h3>
+                <p class="subtitle">CRM · Личные кабинеты · Админ-панели</p>
+                <p>Масштабируемые веб-системы для бизнеса.</p>
+
+                <ul class="service-list">
+                    <li>Backend: Flask / Django</li>
+                    <li>Авторизация и роли</li>
+                    <li>База данных</li>
+                    <li>Админ-панель</li>
+                    <li>Безопасность</li>
+                </ul>
+
+                <p class="price">💰 от 200 $</p>
+                <p class="time">⏱ 7–14 дней</p>
+
+                {% if session.user_id and session.role == 'client' %}
+                <a href="{{ url_for('discussions', service='Веб-приложения') }}" class="btn-primary">Обсудить</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn-primary">Обсудить</a>
+                {% endif %}
+            </div>
+
+            <div class="service-card">
+                <h3>🤖 Боты</h3>
+                <p class="subtitle">Telegram · Discord · WhatsApp</p>
+                <p>Автоматизация общения и процессов.</p>
+
+                <ul class="service-list">
+                    <li>Приём заявок</li>
+                    <li>Автоответы</li>
+                    <li>Уведомления</li>
+                    <li>Интеграция с CRM</li>
+                </ul>
+
+                <p class="price">💰 от 100 $</p>
+                <p class="time">⏱ 2–5 дней</p>
+
+                {% if session.user_id and session.role == 'client' %}
+                <a href="{{ url_for('discussions', service='Боты') }}" class="btn-primary">Обсудить</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn-primary">Обсудить</a>
+                {% endif %}
+            </div>
+
+            <div class="service-card">
+                <h3>🧠 AI и автоматизация</h3>
+                <p class="subtitle">AI-ассистенты · Автоматизация бизнеса</p>
+                <p>Внедрение AI-решений под ключ.</p>
+
+                <ul class="service-list">
+                    <li>AI-ассистенты</li>
+                    <li>Автоматизация процессов</li>
+                    <li>Анализ данных</li>
+                    <li>Кастомные решения</li>
+                </ul>
+
+                <p class="price">💰 от 300 $</p>
+                <p class="time">⏱ индивидуально</p>
+
+                {% if session.user_id and session.role == 'client' %}
+                <a href="{{ url_for('discussions', service='AI и автоматизация') }}" class="btn-primary">Обсудить</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn-primary">Обсудить</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>Телефон: +38 095 713 66 14</p>
+                <p>Email: itw23265@gmail.com</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Соцсети</h4>
+                <a href="https://t.me/worldit23">Telegram</a><br>
+                <a href="https://discord.gg/uKzRMmshnp">Discord</a>
+            </div>
+
+            <div class="footer-section">
+                <a href="{{ url_for('terms') }}">Условия использования</a>
+                <a href="{{ url_for('privacy') }}">Политика и правила</a>
+            </div>
         </div>
 
-        <!-- SERVICE 2 -->
-        <div class="service-card">
-            <h3>🌐 Веб-приложения</h3>
-            <p class="subtitle">CRM · Личные кабинеты · Админ-панели</p>
-            <p>Масштабируемые веб-системы для бизнеса.</p>
-
-            <ul class="service-list">
-                <li>Backend: Flask / Django</li>
-                <li>Авторизация и роли</li>
-                <li>База данных</li>
-                <li>Админ-панель</li>
-                <li>Безопасность</li>
-            </ul>
-
-            <p class="price">💰 от 200 $</p>
-            <p class="time">⏱ 7–14 дней</p>
-
-            <form action="{{ url_for('create_chat') }}" method="post">
-                <input type="hidden" name="service" value="Веб-приложения">
-                <button type="submit" class="btn-primary">Обсудить</button>
-            </form>
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
         </div>
-
-        <!-- SERVICE 3 -->
-        <div class="service-card">
-            <h3>🤖 Боты</h3>
-            <p class="subtitle">Telegram · Discord · WhatsApp</p>
-            <p>Автоматизация общения и процессов.</p>
-
-            <ul class="service-list">
-                <li>Приём заявок</li>
-                <li>Автоответы</li>
-                <li>Уведомления</li>
-                <li>Интеграция с CRM</li>
-            </ul>
-
-            <p class="price">💰 от 100 $</p>
-            <p class="time">⏱ 2–5 дней</p>
-
-            <form action="{{ url_for('create_chat') }}" method="post">
-                <input type="hidden" name="service" value="Боты">
-                <button type="submit" class="btn-primary">Обсудить</button>
-            </form>
-        </div>
-
-        <!-- SERVICE 4 -->
-        <div class="service-card">
-            <h3>🧠 AI и автоматизация</h3>
-            <p class="subtitle">AI-ассистенты · Автоматизация бизнеса</p>
-            <p>Внедрение AI-решений под ключ.</p>
-
-            <ul class="service-list">
-                <li>AI-ассистенты</li>
-                <li>Автоматизация процессов</li>
-                <li>Анализ данных</li>
-                <li>Кастомные решения</li>
-            </ul>
-
-            <p class="price">💰 от 300 $</p>
-            <p class="time">⏱ индивидуально</p>
-
-            <form action="{{ url_for('create_chat') }}" method="post">
-                <input type="hidden" name="service" value="AI и автоматизация">
-                <button type="submit" class="btn-primary">Обсудить</button>
-            </form>
-        </div>
-
-    </div>
-</section>
-
-<!-- ===== FOOTER ===== -->
-<footer class="footer">
-    <div class="container footer-container">
-        <div class="footer-section">
-            <h4>Контакты</h4>
-            <p>Телефон: +38 095 713 66 14</p>
-            <p>Email: itw23265@gmail.com</p>
-        </div>
-
-        <div class="footer-section">
-            <h4>Соцсети</h4>
-            <a href="https://t.me/worldit23">Telegram</a><br>
-            <a href="https://discord.gg/uKzRMmshnp">Discord</a>
-        </div>
-
-        <div class="footer-section">
-            <a href="{{ url_for('terms') }}">Условия использования</a>
-            <a href="{{ url_for('privacy') }}">Политика и правила</a>
-        </div>
-    </div>
-
-    <div class="footer-bottom">
-        &copy; 2025 ARKONIX. Все права защищены.
-    </div>
-</footer>
+    </footer>
 
 </body>
+
 </html>

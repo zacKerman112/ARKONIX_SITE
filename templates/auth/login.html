@@ -1,24 +1,209 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Вход | ARKONIX</title>
+  <title>Вход - ARKONIX</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .login-container {
+      max-width: 450px;
+      margin: 120px auto 50px;
+      padding: 40px;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .login-container h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #38bdf8;
+      font-size: 2.2em;
+      font-weight: 900;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #cbd5f5;
+      font-weight: 600;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px;
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #e5e7eb;
+      font-size: 1em;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border: none;
+      border-radius: 12px;
+      color: #020617;
+      font-weight: 800;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 24px rgba(56, 189, 248, 0.4);
+    }
+
+    .links {
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    .links a {
+      color: #38bdf8;
+      text-decoration: none;
+      transition: color 0.3s;
+      display: block;
+      margin: 10px 0;
+    }
+
+    .links a:hover {
+      color: #818cf8;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 25px 0;
+      color: #64748b;
+      position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider::before {
+      left: 0;
+    }
+
+    .divider::after {
+      right: 0;
+    }
+
+    .staff-register-link {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      background: rgba(129, 140, 248, 0.1);
+      border: 1px solid rgba(129, 140, 248, 0.3);
+      border-radius: 10px;
+      color: #818cf8;
+      text-decoration: none;
+      margin-top: 20px;
+      transition: all 0.3s;
+    }
+
+    .staff-register-link:hover {
+      background: rgba(129, 140, 248, 0.2);
+      border-color: #818cf8;
+      transform: translateY(-2px);
+    }
+
+    .flash-messages {
+      margin-bottom: 20px;
+    }
+
+    .flash {
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .flash.error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+  </style>
 </head>
+
 <body>
+  <header class="header">
+    <div class="container header-container">
+      <div class="logo">
+        <a href="/" style="color: inherit; text-decoration: none;">ARKONIX</a>
+      </div>
+      <nav class="nav">
+        <a href="/">Главная</a>
+        <a href="/services">Услуги</a>
+        <a href="/team">Команда</a>
+      </nav>
+      <div class="user-panel">
+        <a href="/register">Регистрация</a>
+      </div>
+    </div>
+  </header>
 
-<div class="auth-page">
-  <div class="auth-card">
-    <h2 class="auth-title">Вход в аккаунт</h2>
-    <form class="auth-form" action="/login" method="POST">
-      <input type="text" name="username" placeholder="Имя пользователя" required>
-      <input type="password" name="password" placeholder="Пароль" required>
-      <button type="submit">Войти</button>
+  <div class="login-container">
+    <h1>🔐 Вход</h1>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="flash-messages">
+      {% for message in messages %}
+      <div class="flash error">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <div class="form-group">
+        <label for="username">Логин</label>
+        <input type="text" id="username" name="username" required placeholder="Введите логин">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" required placeholder="Введите пароль">
+      </div>
+
+      <button type="submit" class="submit-btn">Войти</button>
     </form>
-    <p class="auth-switch">Нет аккаунта? <a href="/register">Регистрация</a></p>
-  </div>
-</div>
 
+    <div class="links">
+      <a href="/register">Нет аккаунта? Зарегистрироваться</a>
+    </div>
+
+    <div class="divider">или</div>
+
+    <a href="/staff/register" class="staff-register-link">
+      👔 Регистрация для сотрудников
+    </a>
+  </div>
 </body>
+
 </html>

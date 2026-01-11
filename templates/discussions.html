@@ -156,7 +156,11 @@
             </nav>
 
             <div class="user-panel">
+                {% if session.role in ['admin', 'staff'] %}
+                <a href="/profile">Админ-панель</a>
+                {% else %}
                 <a href="/profile">Личный кабинет</a>
+                {% endif %}
                 <a href="/logout">Выход</a>
             </div>
         </div>
@@ -185,13 +189,20 @@
                     <label for="service">Тип услуги *</label>
                     <select name="service" id="service" required>
                         <option value="">Выберите услугу</option>
-                        <option value="Веб-разработка">🌐 Веб-разработка</option>
-                        <option value="Telegram-боты">🤖 Telegram-боты</option>
-                        <option value="AI-решения">🧠 AI-решения</option>
-                        <option value="Мобильные приложения">📱 Мобильные приложения</option>
-                        <option value="Backend-разработка">⚙️ Backend-разработка</option>
-                        <option value="Консультация">💡 Консультация</option>
-                        <option value="Другое">🔧 Другое</option>
+                        <option value="Разработка сайтов" {% if selected_service=='Разработка сайтов' %}selected{% endif
+                            %}>🖥 Разработка сайтов</option>
+                        <option value="Веб-приложения" {% if selected_service=='Веб-приложения' %}selected{% endif %}>🌐
+                            Веб-приложения</option>
+                        <option value="Боты" {% if selected_service=='Боты' %}selected{% endif %}>🤖 Боты</option>
+                        <option value="AI и автоматизация" {% if selected_service=='AI и автоматизация' %}selected{%
+                            endif %}>🧠 AI и автоматизация</option>
+                        <option value="Мобильные приложения" {% if selected_service=='Мобильные приложения' %}selected{%
+                            endif %}>📱 Мобильные приложения</option>
+                        <option value="Backend-разработка" {% if selected_service=='Backend-разработка' %}selected{%
+                            endif %}>⚙️ Backend-разработка</option>
+                        <option value="Консультация" {% if selected_service=='Консультация' %}selected{% endif %}>💡
+                            Консультация</option>
+                        <option value="Другое" {% if selected_service=='Другое' %}selected{% endif %}>🔧 Другое</option>
                     </select>
                 </div>
 
@@ -205,7 +216,8 @@
                 <button type="submit" class="submit-btn">Создать обсуждение</button>
             </form>
 
-            <a href="/profile" class="back-link">← Вернуться в личный кабинет</a>
+            <a href="/profile" class="back-link">← Вернуться в {% if session.role in ['admin', 'staff'] %}админ-панель{%
+                else %}личный кабинет{% endif %}</a>
         </div>
     </div>
 
@@ -214,8 +226,7 @@
             <div class="footer-section">
                 <h4>Контакты</h4>
                 <p>Телефон: +38 095 713 66 14</p>
-                <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
-                        data-cfemail="70190407424342464530171d11191c5e131f1d">[email&#160;protected]</a></p>
+                <p>Email: itw23265@gmail.com</p>
             </div>
 
             <div class="footer-section">
@@ -230,4 +241,11 @@
             </div>
         </div>
 
-        <div class
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -116,12 +116,24 @@
             transition: all 0.3s;
             cursor: pointer;
             background: rgba(2, 6, 23, 0.4);
+            position: relative;
         }
 
         .chat-item:hover {
             border-color: #38bdf8;
             box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
             transform: translateY(-4px);
+        }
+
+        /* Подсветка для чатов в ожидании */
+        .chat-item.waiting {
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        .chat-item.waiting:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
         }
 
         .chat-header {
@@ -148,6 +160,7 @@
             flex-wrap: wrap;
             color: #94a3b8;
             font-size: 0.9em;
+            margin-bottom: 12px;
         }
 
         .chat-meta span {
@@ -156,17 +169,71 @@
             gap: 5px;
         }
 
+        .client-info {
+            background: rgba(56, 189, 248, 0.1);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 3px solid #38bdf8;
+        }
+
+        .client-info-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            color: #cbd5f5;
+            font-size: 0.95em;
+        }
+
+        .client-info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .client-info-label {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .client-info-value {
+            color: #e5e7eb;
+        }
+
+        .client-info-value a {
+            color: #38bdf8;
+            text-decoration: none;
+        }
+
+        .client-info-value a:hover {
+            text-decoration: underline;
+        }
+
         .status-badge {
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.85em;
             font-weight: 600;
+            animation: none;
         }
 
         .status-waiting {
             background: rgba(251, 191, 36, 0.2);
             color: #fbbf24;
             border: 1px solid rgba(251, 191, 36, 0.3);
+            animation: pulse-waiting 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-waiting {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+            }
         }
 
         .status-in_progress {
@@ -235,6 +302,31 @@
         .logout-btn {
             margin-top: 20px;
         }
+
+        /* Индикатор нового чата */
+        .new-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            background: #fbbf24;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
     </style>
 </head>
 
@@ -250,6 +342,7 @@
                 <a href="/">Главная</a>
                 <a href="/services">Услуги</a>
                 <a href="/team">Команда</a>
+                <a href="/discussions">Обсуждения</a>
             </nav>
 
             <div class="user-panel">
@@ -288,15 +381,21 @@
             <a href="/admin/reviews" class="action-btn">
                 📝 Управление отзывами
             </a>
+            <a href="/admin/team" class="action-btn">
+                👥 Участники команды
+            </a>
         </div>
 
-       
         <div class="chats-section">
             <h2>📋 Все обсуждения</h2>
 
             {% if chats %}
             {% for chat in chats %}
-            <div class="chat-item">
+            <div class="chat-item {% if chat['status'] == 'waiting' %}waiting{% endif %}">
+                {% if chat['status'] == 'waiting' %}
+                <div class="new-indicator"></div>
+                {% endif %}
+
                 <div class="chat-header">
                     <div class="chat-info">
                         <h3>{{ chat['username'] }}</h3>
@@ -308,13 +407,32 @@
                     </div>
                     <span class="status-badge status-{{ chat['status'] }}">
                         {% if chat['status'] == 'waiting' %}
-                        ⏳ Ожидает
+                        ⏳ Ожидает ответа
                         {% elif chat['status'] == 'in_progress' %}
                         🔄 В процессе
                         {% else %}
                         ✅ Завершено
                         {% endif %}
                     </span>
+                </div>
+
+                <div class="client-info">
+                    <div class="client-info-row">
+                        <div class="client-info-item">
+                            <span class="client-info-label">ID:</span>
+                            <span class="client-info-value">#{{ chat['client_id'] }}</span>
+                        </div>
+                        <div class="client-info-item">
+                            <span class="client-info-label">Email:</span>
+                            <span class="client-info-value">
+                                {% if chat['email'] %}
+                                <a href="mailto:{{ chat['email'] }}">{{ chat['email'] }}</a>
+                                {% else %}
+                                Не указан
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 {% if chat['last_message'] %}
@@ -326,7 +444,11 @@
 
                 <div class="chat-actions">
                     <a href="/chat/{{ chat['id'] }}" class="btn btn-primary">
+                        {% if chat['status'] == 'waiting' %}
+                        Ответить →
+                        {% else %}
                         Открыть чат →
+                        {% endif %}
                     </a>
                 </div>
             </div>
@@ -351,8 +473,7 @@
             <div class="footer-section">
                 <h4>Контакты</h4>
                 <p>Телефон: +38 095 713 66 14</p>
-                <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
-                        data-cfemail="bad3cecd8889888c8ffaddd7dbd3d694d9d5d7">[email&#160;protected]</a></p>
+                <p>Email: itw23265@gmail.com</p>
             </div>
 
             <div class="footer-section">
@@ -367,4 +488,11 @@
             </div>
         </div>
 
-        <div class="footer-bott
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
+        </div>
+    </footer>
+
+</body>
+
+</html>

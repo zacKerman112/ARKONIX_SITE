@@ -6,6 +6,315 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARKONIX - Разработка веб-приложений и AI-решений</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Красивые звёзды для отзывов */
+        .stars {
+            display: inline-flex !important;
+            gap: 6px !important;
+            font-size: 1.8em !important;
+            margin: 15px 0 !important;
+            line-height: 1 !important;
+        }
+
+        .stars .star {
+            display: inline-block !important;
+            transition: all 0.3s ease !important;
+            filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.5)) !important;
+            cursor: default !important;
+        }
+
+        .review-card:hover .stars .star {
+            transform: scale(1.15) !important;
+            filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.8)) !important;
+        }
+
+        /* Волновая анимация для каждой звезды */
+        .stars .star:nth-child(1) {
+            animation: starTwinkle 2.5s ease-in-out infinite !important;
+        }
+
+        .stars .star:nth-child(2) {
+            animation: starTwinkle 2.5s ease-in-out 0.3s infinite !important;
+        }
+
+        .stars .star:nth-child(3) {
+            animation: starTwinkle 2.5s ease-in-out 0.6s infinite !important;
+        }
+
+        .stars .star:nth-child(4) {
+            animation: starTwinkle 2.5s ease-in-out 0.9s infinite !important;
+        }
+
+        .stars .star:nth-child(5) {
+            animation: starTwinkle 2.5s ease-in-out 1.2s infinite !important;
+        }
+
+        @keyframes starTwinkle {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+
+            25% {
+                opacity: 0.8;
+                transform: scale(1.08) rotate(5deg);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(1.12) rotate(-5deg);
+            }
+
+            75% {
+                opacity: 0.8;
+                transform: scale(1.08) rotate(5deg);
+            }
+        }
+
+        .review-card {
+            position: relative !important;
+        }
+
+        /* Красивый селект со звёздами */
+        .review-form select {
+            font-size: 1.2em !important;
+            padding: 14px !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            cursor: pointer !important;
+        }
+
+        .review-form select option {
+            background: #0f172a !important;
+            padding: 10px !important;
+            font-size: 1.1em !important;
+            letter-spacing: 3px !important;
+        }
+
+        .review-form select option:hover {
+            background: rgba(56, 189, 248, 0.2) !important;
+        }
+
+        /* Звёзды в селекте */
+        .review-form select {
+            filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+        }
+
+        .review-form select:focus {
+            filter: drop-shadow(0 4px 8px rgba(255, 215, 0, 0.5));
+        }
+
+        /* ========== БУРГЕР-МЕНЮ ДЛЯ МОБИЛЬНЫХ ========== */
+        .burger-menu {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 10px;
+        }
+
+        .burger-line {
+            width: 28px;
+            height: 3px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .burger-menu:hover .burger-line {
+            background: linear-gradient(90deg, #818cf8, #38bdf8);
+        }
+
+        .burger-menu.active .burger-line:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .burger-menu.active .burger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .burger-menu.active .burger-line:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Адаптивность для планшетов и телефонов */
+        @media (max-width: 968px) {
+            .burger-menu {
+                display: flex !important;
+            }
+
+            .nav {
+                position: fixed !important;
+                top: 0 !important;
+                right: -100% !important;
+                width: 320px !important;
+                max-width: 85vw !important;
+                height: 100vh !important;
+                background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+                flex-direction: column !important;
+                padding: 90px 25px 30px !important;
+                gap: 0 !important;
+                z-index: 1000 !important;
+                transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.7) !important;
+                overflow-y: auto !important;
+            }
+
+            .nav.active {
+                right: 0 !important;
+            }
+
+            .nav a {
+                padding: 18px 20px !important;
+                margin: 8px 0 !important;
+                border-radius: 12px !important;
+                background: rgba(56, 189, 248, 0.08) !important;
+                border: 1px solid rgba(56, 189, 248, 0.15) !important;
+                transition: all 0.3s ease !important;
+                font-size: 1.1em !important;
+                text-align: left !important;
+            }
+
+            .nav a:hover,
+            .nav a:active {
+                background: rgba(56, 189, 248, 0.2) !important;
+                border-color: rgba(56, 189, 248, 0.4) !important;
+                transform: translateX(-8px) !important;
+                box-shadow: 5px 0 15px rgba(56, 189, 248, 0.3) !important;
+            }
+
+            .user-panel {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: -100% !important;
+                right: auto !important;
+                width: 100% !important;
+                background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+                padding: 25px 20px 30px !important;
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 12px !important;
+                z-index: 1000 !important;
+                transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+                border-top: 3px solid rgba(56, 189, 248, 0.3) !important;
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.7) !important;
+            }
+
+            .user-panel.active {
+                left: 0 !important;
+            }
+
+            .user-panel a {
+                padding: 16px 18px !important;
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(129, 140, 248, 0.15)) !important;
+                border: 2px solid rgba(56, 189, 248, 0.3) !important;
+                border-radius: 14px !important;
+                text-align: center !important;
+                font-weight: 700 !important;
+                font-size: 1em !important;
+                transition: all 0.3s ease !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-height: 56px !important;
+                white-space: nowrap !important;
+            }
+
+            .user-panel a:hover,
+            .user-panel a:active {
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(129, 140, 248, 0.3)) !important;
+                transform: translateY(-3px) !important;
+                box-shadow: 0 8px 25px rgba(56, 189, 248, 0.5) !important;
+                border-color: rgba(56, 189, 248, 0.6) !important;
+            }
+
+            .header-container {
+                justify-content: space-between !important;
+            }
+
+            .logo {
+                z-index: 1001 !important;
+            }
+        }
+
+        /* Средние экраны (планшеты в портретной ориентации) */
+        @media (max-width: 768px) and (min-width: 481px) {
+            .user-panel {
+                padding: 22px 20px 28px !important;
+            }
+
+            .user-panel a {
+                padding: 16px 18px !important;
+                min-height: 54px !important;
+                font-size: 0.98em !important;
+            }
+        }
+
+        /* Маленькие телефоны */
+        @media (max-width: 480px) {
+            .burger-line {
+                width: 24px !important;
+                height: 2.5px !important;
+            }
+
+            .nav {
+                padding: 80px 20px 25px !important;
+                width: 100% !important;
+                max-width: 100vw !important;
+            }
+
+            .nav a {
+                font-size: 1em !important;
+                padding: 16px 18px !important;
+            }
+
+            .user-panel {
+                padding: 20px 15px 25px !important;
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+
+            .user-panel a {
+                padding: 15px 16px !important;
+                font-size: 0.95em !important;
+                min-height: 52px !important;
+            }
+        }
+
+        /* Очень маленькие экраны */
+        @media (max-width: 360px) {
+            .user-panel {
+                padding: 18px 12px 22px !important;
+            }
+
+            .user-panel a {
+                padding: 13px 14px !important;
+                font-size: 0.9em !important;
+                min-height: 48px !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -26,14 +335,18 @@
                 <a href="{{ url_for('main') }}">Главная</a>
                 <a href="{{ url_for('services') }}">Услуги</a>
                 <a href="{{ url_for('team') }}">Команда</a>
-                {% if session.user_id and session.role == 'client' %}
-                <a href="{{ url_for('discussions') }}">Обсуждения</a>
+                {% if session.user_id %}
+                <a href="/discussions">Обсуждения</a>
                 {% endif %}
             </nav>
 
             <div class="user-panel" id="userPanel">
                 {% if session.user_id %}
+                {% if session.role == 'admin' %}
+                <a href="{{ url_for('profile') }}">Админ-панель</a>
+                {% else %}
                 <a href="{{ url_for('profile') }}">Личный кабинет</a>
+                {% endif %}
                 <a href="{{ url_for('logout') }}">Выход</a>
                 {% else %}
                 <a href="{{ url_for('login') }}">Вход</a>
@@ -165,7 +478,7 @@
             <div class="review-card">
                 <h4>{{ r[0] }}</h4>
                 <div class="stars">
-                    {% for i in range(r[1]|int) %}⭐{% endfor %}
+                    {% for i in range(r[1]|int) %}<span class="star">⭐</span>{% endfor %}
                 </div>
                 <p>{{ r[2] }}</p>
                 <span class="date">{{ r[3] }}</span>
@@ -185,12 +498,12 @@
                 <form method="post" action="{{ url_for('add_review') }}">
                     <input name="name" placeholder="Имя" required>
                     <select name="rating" required>
-                        <option value="">Оценка</option>
-                        <option value="5">⭐⭐⭐⭐⭐</option>
-                        <option value="4">⭐⭐⭐⭐</option>
-                        <option value="3">⭐⭐⭐</option>
-                        <option value="2">⭐⭐</option>
-                        <option value="1">⭐</option>
+                        <option value="">⭐ Выберите оценку</option>
+                        <option value="5">⭐⭐⭐⭐⭐ Отлично!</option>
+                        <option value="4">⭐⭐⭐⭐ Хорошо</option>
+                        <option value="3">⭐⭐⭐ Нормально</option>
+                        <option value="2">⭐⭐ Плохо</option>
+                        <option value="1">⭐ Ужасно</option>
                     </select>
                     <textarea name="comment" placeholder="Ваш отзыв" required></textarea>
                     <button type="submit">Отправить</button>

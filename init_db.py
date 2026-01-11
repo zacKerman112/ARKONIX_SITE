@@ -11,6 +11,7 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         password TEXT,
+        email TEXT,
         role TEXT DEFAULT 'client' -- client, staff, admin
     )
     """)
@@ -48,6 +49,7 @@ def init_db():
         service_name TEXT,
         status TEXT DEFAULT 'waiting', -- waiting, in_progress, finished
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (client_id) REFERENCES users(id),
         FOREIGN KEY (staff_id) REFERENCES users(id)
     )
@@ -66,14 +68,51 @@ def init_db():
     )
     """)
 
+    # ---------- Участники команды ----------
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS team_members (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL,
+        position TEXT NOT NULL,
+        contract_filename TEXT NOT NULL,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL,
+        email TEXT,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # ---------- МИГРАЦИЯ: Добавление колонки last_message_at если её нет ----------
+    print("\n🔧 Проверка миграций...")
+    try:
+        cursor.execute("PRAGMA table_info(chats)")
+        columns = [column[1] for column in cursor.fetchall()]
+
+        if "last_message_at" not in columns:
+            print("📝 Добавление колонки last_message_at...")
+            cursor.execute(
+                "ALTER TABLE chats ADD COLUMN last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+            )
+            # Обновляем существующие записи
+            cursor.execute(
+                "UPDATE chats SET last_message_at = created_at WHERE last_message_at IS NULL"
+            )
+            print("✅ Колонка last_message_at успешно добавлена")
+        else:
+            print("✅ Колонка last_message_at уже существует")
+    except sqlite3.OperationalError as e:
+        print(f"⚠️ Ошибка при миграции: {e}")
+
     # ---------- СОЗДАНИЕ ТЕСТОВЫХ ПОЛЬЗОВАТЕЛЕЙ ----------
     print("\n🔧 Создание тестовых пользователей...")
 
     # Админ
     try:
         cursor.execute("""
-            INSERT INTO users (username, password, role) 
-            VALUES ('admin', 'admin123', 'admin')
+            INSERT INTO users (username, password, email, role) 
+            VALUES ('admin', 'admin123', 'admin@arkonix.com', 'admin')
         """)
         print("✅ Создан АДМИН: username='admin', password='admin123'")
     except sqlite3.IntegrityError:
@@ -82,8 +121,8 @@ def init_db():
     # Сотрудник
     try:
         cursor.execute("""
-            INSERT INTO users (username, password, role) 
-            VALUES ('staff', 'staff123', 'staff')
+            INSERT INTO users (username, password, email, role) 
+            VALUES ('staff', 'staff123', 'staff@arkonix.com', 'staff')
         """)
         print("✅ Создан СОТРУДНИК: username='staff', password='staff123'")
     except sqlite3.IntegrityError:
@@ -92,8 +131,8 @@ def init_db():
     # Тестовый клиент
     try:
         cursor.execute("""
-            INSERT INTO users (username, password, role) 
-            VALUES ('client', 'client123', 'client')
+            INSERT INTO users (username, password, email, role) 
+            VALUES ('client', 'client123', 'client@example.com', 'client')
         """)
         print("✅ Создан КЛИЕНТ (для теста): username='client', password='client123'")
     except sqlite3.IntegrityError:

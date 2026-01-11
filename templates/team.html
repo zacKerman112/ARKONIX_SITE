@@ -1,143 +1,153 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <title>Команда | ARKONIX</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
-<!-- ===== HEADER ===== -->
-<header class="header">
-    <div class="container header-container">
-        <div class="logo">ARKONIX</div>
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">ARKONIX</div>
 
-        <nav class="nav">
-            <a href="{{ url_for('main') }}">Главная</a>
-            <a href="{{ url_for('services') }}">Услуга</a>
-            <a href="{{ url_for('team') }}">Команда</a>
-        </nav>
+            <nav class="nav">
+                <a href="{{ url_for('main') }}">Главная</a>
+                <a href="{{ url_for('services') }}">Услуги</a>
+                <a href="{{ url_for('team') }}">Команда</a>
+                {% if session.user_id %}
+                <a href="/discussions">Обсуждения</a>
+                {% endif %}
+            </nav>
 
-        <div class="user-panel">
-            <a href="{{ url_for('profile') }}">Личный кабинет</a>
-        </div>
-    </div>
-</header>
-
-<!-- ===== TEAM SECTION ===== -->
-<main class="team-section" style="padding-top: 100px;">
-
-    <h2 class="team-title">Наша команда</h2>
-
-    <div class="team-grid">
-
-        <!-- Карточка: SEO -->
-        <div class="team-card">
-            <div class="avatar">
-                <img src="{{ url_for('static', filename='img/alexey.jpg') }}" alt="Роман">
-            </div>
-            <h3 class="name">Роман Литвицкий</h3>
-            <p class="role">SEO компании</p>
-            <div class="contacts">
-                <p><strong>Telegram:</strong> <a href="https://t.me/alexey" target="_blank">@DraveFafner</a></p>
-                <p><strong>Discord:</strong> <a href="https://discord.com/users/123456" target="_blank">@roman_python</a></p>
-            </div>
-            <div class="skills">
-                <span>Python</span>
-                <span>Backend</span>
-                <span>Django</span>
-                <span>Team Leader</span>
+            <div class="user-panel">
+                {% if session.user_id %}
+                {% if session.role in ['admin', 'staff'] %}
+                <a href="{{ url_for('profile') }}">Админ-панель</a>
+                {% else %}
+                <a href="{{ url_for('profile') }}">Личный кабинет</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Выход</a>
+                {% else %}
+                <a href="{{ url_for('login') }}">Войти</a>
+                <a href="{{ url_for('register') }}">Регистрация</a>
+                {% endif %}
             </div>
         </div>
+    </header>
 
-        <!-- Карточка: PM Фёдор -->
-        <div class="team-card">
-            <div class="avatar">
-                <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Фёдор">
+    <main class="team-section" style="padding-top: 100px;">
+
+        <h2 class="team-title">Наша команда</h2>
+
+        <div class="team-grid">
+
+            <div class="team-card">
+                <div class="avatar">
+                    <img src="{{ url_for('static', filename='img/alexey.jpg') }}" alt="Роман">
+                </div>
+                <h3 class="name">Роман Литвицкий</h3>
+                <p class="role">SEO компании</p>
+                <div class="contacts">
+                    <p><strong>Telegram:</strong> <a href="https://t.me/DraveFafner" target="_blank">@DraveFafner</a>
+                    </p>
+                    <p><strong>Discord:</strong> <a href="https://discord.com/users/123456"
+                            target="_blank">@roman_python</a></p>
+                </div>
+                <div class="skills">
+                    <span>Python</span>
+                    <span>Backend</span>
+                    <span>Django</span>
+                    <span>Team Leader</span>
+                </div>
             </div>
-            <h3 class="name">Фёдор Смирнов</h3>
-            <p class="role">Project Maneger</p>
-            <div class="skills">
-                <span>Analitic</span>
-                <span>Task Assignment</span>
-                <span>Client Communication</span>
-                <span>Team Leader</span>
+
+            <div class="team-card">
+                <div class="avatar">
+                    <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Фёдор">
+                </div>
+                <h3 class="name">Фёдор Смирнов</h3>
+                <p class="role">Project Manager</p>
+                <div class="skills">
+                    <span>Analytics</span>
+                    <span>Task Assignment</span>
+                    <span>Client Communication</span>
+                    <span>Team Leader</span>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="avatar">
+                    <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
+                </div>
+                <h3 class="name">Радион Пилипенко</h3>
+                <p class="role">Backend Lead</p>
+                <div class="skills">
+                    <span>Python</span>
+                    <span>Java</span>
+                    <span>Backend</span>
+                    <span>Team Leader</span>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="avatar">
+                    <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
+                </div>
+                <h3 class="name">Радион Пилипенко</h3>
+                <p class="role">Backend Lead</p>
+                <div class="skills">
+                    <span>Python</span>
+                    <span>Java</span>
+                    <span>Backend</span>
+                    <span>Team Leader</span>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="avatar">
+                    <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
+                </div>
+                <h3 class="name">Радион Пилипенко</h3>
+                <p class="role">Backend Lead</p>
+                <div class="skills">
+                    <span>Python</span>
+                    <span>Java</span>
+                    <span>Backend</span>
+                    <span>Team Leader</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>Телефон: +38 095 713 66 14</p>
+                <p>Email: itw23265@gmail.com</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Соцсети</h4>
+                <a href="https://t.me/worldit23">Telegram</a><br>
+                <a href="https://discord.gg/uKzRMmshnp">Discord</a>
+            </div>
+
+            <div class="footer-section">
+                <a href="{{ url_for('terms') }}">Условия использования</a>
+                <a href="{{ url_for('privacy') }}">Политика и правила</a>
             </div>
         </div>
 
-        <!-- Карточка: Радион -->
-        <div class="team-card">
-            <div class="avatar">
-                <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
-            </div>
-            <h3 class="name">Радион Пилипенко</h3>
-            <p class="role">Backend Lead</p>
-            <div class="skills">
-                <span>Python</span>
-                <span>Java</span>
-                <span>Backend</span>
-                <span>Team Leader</span>
-            </div>
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
         </div>
-
-        <!-- Карточка: Радион -->
-        <div class="team-card">
-            <div class="avatar">
-                <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
-            </div>
-            <h3 class="name">Радион Пилипенко</h3>
-            <p class="role">Backend Lead</p>
-            <div class="skills">
-                <span>Python</span>
-                <span>Java</span>
-                <span>Backend</span>
-                <span>Team Leader</span>
-            </div>
-        </div>
-
-        <!-- Карточка: Радион -->
-        <div class="team-card">
-            <div class="avatar">
-                <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
-            </div>
-            <h3 class="name">Радион Пилипенко</h3>
-            <p class="role">Backend Lead</p>
-            <div class="skills">
-                <span>Python</span>
-                <span>Java</span>
-                <span>Backend</span>
-                <span>Team Leader</span>
-            </div>
-        </div>
-
-    </div>
-</main>
-
-<!-- ===== FOOTER ===== -->
-<footer class="footer">
-    <div class="container footer-container">
-        <div class="footer-section">
-            <h4>Контакты</h4>
-            <p>Телефон: +38 095 713 66 14</p>
-            <p>Email: itw23265@gmail.com</p>
-        </div>
-
-        <div class="footer-section">
-            <h4>Соцсети</h4>
-            <a href="https://t.me/worldit23">Telegram</a><br>
-            <a href="https://discord.gg/uKzRMmshnp">Discord</a>
-        </div>
-
-        <div class="footer-section">
-            <a href="{{ url_for('terms') }}">Условия использования</a>
-            <a href="{{ url_for('privacy') }}">Политика и правила</a>
-        </div>
-    </div>
-
-    <div class="footer-bottom">
-        &copy; 2025 ARKONIX. Все права защищены.
-    </div>
-</footer>
+    </footer>
 
 </body>
+
 </html>
