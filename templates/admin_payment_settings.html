@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Настройки оплаты - ARKONIX Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 800;
+            color: #e5e7eb;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1.05em;
+        }
+
+        .card-form {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-section h3 {
+            color: #38bdf8;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            color: #cbd5f5;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(2, 6, 23, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: #e5e7eb;
+            border-radius: 12px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #38bdf8;
+            background: rgba(2, 6, 23, 1);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        .card-preview {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-preview h4 {
+            color: #38bdf8;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .card-number-preview {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #e5e7eb;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .card-holder-preview {
+            color: #94a3b8;
+            font-size: 0.95em;
+        }
+
+        .card-holder-preview span {
+            color: #cbd5f5;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            color: #94a3b8;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #38bdf8;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: #020617;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(100, 116, 139, 0.2);
+            color: #cbd5f5;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100, 116, 139, 0.3);
+        }
+
+        .flash-message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .flash-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+
+        .flash-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        @media (max-width: 640px) {
+            .card-form {
+                padding: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .card-number-preview {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Настройки оплаты</h1>
+            <p>Управление банковской картой для приема платежей</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="flash-message {% if '✅' in message %}flash-success{% else %}flash-error{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="card-form">
+            {% if card_data %}
+            <div class="card-preview">
+                <h4>🎴 Текущая карта</h4>
+                <div class="card-number-preview">{{ card_data.card_number }}</div>
+                <div class="card-holder-preview">
+                    Получатель: <span>{{ card_data.card_holder }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="form-section">
+                <h3>{% if card_data %}Обновить данные карты{% else %}Добавить карту{% endif %}</h3>
+
+                <div class="info-box">
+                    <strong>ℹ️ Информация:</strong> На эту карту будут приходить все платежи от клиентов. Убедитесь, что
+                    данные введены корректно.
+                </div>
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label class="form-label" for="card_number">Номер карты</label>
+                        <input type="text" class="form-input" id="card_number" name="card_number"
+                            placeholder="0000 0000 0000 0000" value="{{ card_data.card_number if card_data else '' }}"
+                            pattern="[\d\s]+" maxlength="19" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="card_holder">Имя держателя карты</label>
+                        <input type="text" class="form-input" id="card_holder" name="card_holder"
+                            placeholder="IVAN IVANOV" value="{{ card_data.card_holder if card_data else '' }}" required>
+                    </div>
+
+                    <div class="button-group">
+                        <a href="/profile" class="btn btn-secondary">← Назад</a>
+                        <button type="submit" class="btn btn-primary">
+                            💾 {% if card_data %}Обновить{% else %}Сохранить{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Автоформатирование номера карты
+        const cardInput = document.getElementById('card_number');
+        cardInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\s/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
+        // Автоматически переводим имя в верхний регистр
+        const holderInput = document.getElementById('card_holder');
+        holderInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+        });
+    </script>
+</body>
+
+</html>

@@ -97,6 +97,13 @@
             padding: 10px;
         }
 
+        .auth-form select optgroup {
+            background: #1e293b;
+            color: #38bdf8;
+            font-weight: 700;
+            font-style: normal;
+        }
+
         .flash-messages {
             margin-bottom: 20px;
         }
@@ -187,14 +194,124 @@
 
                 <select name="position" required>
                     <option value="">Выберите должность *</option>
-                    <option value="Веб-разработчик">Веб-разработчик</option>
-                    <option value="Дизайнер">Дизайнер</option>
-                    <option value="Маркетолог">Маркетолог</option>
-                    <option value="Контент-менеджер">Контент-менеджер</option>
-                    <option value="Проект-менеджер">Проект-менеджер</option>
-                    <option value="SEO-специалист">SEO-специалист</option>
-                    <option value="Техническая поддержка">Техническая поддержка</option>
-                    <option value="Другое">Другое</option>
+
+                    <optgroup label="💻 Разработка">
+                        <option value="Frontend Developer">Frontend Developer</option>
+                        <option value="Backend Developer">Backend Developer</option>
+                        <option value="Full Stack Developer">Full Stack Developer</option>
+                        <option value="Mobile Developer (iOS)">Mobile Developer (iOS)</option>
+                        <option value="Mobile Developer (Android)">Mobile Developer (Android)</option>
+                        <option value="Mobile Developer (React Native/Flutter)">Mobile Developer (React Native/Flutter)
+                        </option>
+                        <option value="DevOps Engineer">DevOps Engineer</option>
+                        <option value="QA Engineer">QA Engineer / Тестировщик</option>
+                        <option value="QA Automation Engineer">QA Automation Engineer</option>
+                        <option value="Software Architect">Software Architect</option>
+                        <option value="Database Administrator">Database Administrator (DBA)</option>
+                        <option value="Cloud Engineer">Cloud Engineer</option>
+                    </optgroup>
+
+                    <optgroup label="👨‍💼 Технические лидеры">
+                        <option value="Team Lead">Team Lead</option>
+                        <option value="Frontend Team Lead">Frontend Team Lead</option>
+                        <option value="Backend Team Lead">Backend Team Lead</option>
+                        <option value="Mobile Team Lead">Mobile Team Lead</option>
+                        <option value="QA Team Lead">QA Team Lead</option>
+                        <option value="DevOps Team Lead">DevOps Team Lead</option>
+                        <option value="Tech Lead">Tech Lead</option>
+                        <option value="Engineering Manager">Engineering Manager</option>
+                        <option value="CTO">CTO (Chief Technology Officer)</option>
+                    </optgroup>
+
+                    <optgroup label="🎨 Дизайн">
+                        <option value="UI/UX Designer">UI/UX Designer</option>
+                        <option value="UI Designer">UI Designer</option>
+                        <option value="UX Designer">UX Designer</option>
+                        <option value="Graphic Designer">Graphic Designer</option>
+                        <option value="Web Designer">Web Designer</option>
+                        <option value="Motion Designer">Motion Designer</option>
+                        <option value="3D Designer">3D Designer</option>
+                        <option value="Product Designer">Product Designer</option>
+                        <option value="Brand Designer">Brand Designer</option>
+                        <option value="Illustrator">Illustrator</option>
+                        <option value="Lead Designer">Lead Designer</option>
+                    </optgroup>
+
+                    <optgroup label="📊 Управление">
+                        <option value="Project Manager">Project Manager</option>
+                        <option value="Senior Project Manager">Senior Project Manager</option>
+                        <option value="Product Manager">Product Manager</option>
+                        <option value="Senior Product Manager">Senior Product Manager</option>
+                        <option value="Product Owner">Product Owner</option>
+                        <option value="Scrum Master">Scrum Master</option>
+                        <option value="Agile Coach">Agile Coach</option>
+                        <option value="Business Analyst">Business Analyst</option>
+                        <option value="Program Manager">Program Manager</option>
+                        <option value="Delivery Manager">Delivery Manager</option>
+                    </optgroup>
+
+                    <optgroup label="📈 Маркетинг и продвижение">
+                        <option value="Digital Marketer">Digital Marketer</option>
+                        <option value="Marketing Manager">Marketing Manager</option>
+                        <option value="SEO Specialist">SEO Specialist</option>
+                        <option value="Senior SEO Specialist">Senior SEO Specialist</option>
+                        <option value="SMM Manager">SMM Manager</option>
+                        <option value="Content Manager">Content Manager</option>
+                        <option value="Content Strategist">Content Strategist</option>
+                        <option value="Copywriter">Copywriter</option>
+                        <option value="Senior Copywriter">Senior Copywriter</option>
+                        <option value="Email Marketing Specialist">Email Marketing Specialist</option>
+                        <option value="PPC Specialist">PPC Specialist / Контекстолог</option>
+                        <option value="Affiliate Marketing Manager">Affiliate Marketing Manager</option>
+                        <option value="Growth Hacker">Growth Hacker</option>
+                        <option value="Brand Manager">Brand Manager</option>
+                    </optgroup>
+
+                    <optgroup label="💼 Продажи и поддержка">
+                        <option value="Sales Manager">Sales Manager</option>
+                        <option value="Senior Sales Manager">Senior Sales Manager</option>
+                        <option value="Account Manager">Account Manager</option>
+                        <option value="Key Account Manager">Key Account Manager</option>
+                        <option value="Customer Support">Customer Support / Техподдержка</option>
+                        <option value="Senior Support Specialist">Senior Support Specialist</option>
+                        <option value="Customer Success Manager">Customer Success Manager</option>
+                        <option value="Technical Support Engineer">Technical Support Engineer</option>
+                        <option value="Support Team Lead">Support Team Lead</option>
+                    </optgroup>
+
+                    <optgroup label="📊 Аналитика и данные">
+                        <option value="Data Analyst">Data Analyst</option>
+                        <option value="Senior Data Analyst">Senior Data Analyst</option>
+                        <option value="Data Scientist">Data Scientist</option>
+                        <option value="Senior Data Scientist">Senior Data Scientist</option>
+                        <option value="Business Intelligence Analyst">Business Intelligence Analyst</option>
+                        <option value="Data Engineer">Data Engineer</option>
+                        <option value="ML Engineer">ML Engineer / Machine Learning Engineer</option>
+                        <option value="Product Analyst">Product Analyst</option>
+                        <option value="Web Analyst">Web Analyst</option>
+                    </optgroup>
+
+                    <optgroup label="🔒 Безопасность">
+                        <option value="Security Engineer">Security Engineer</option>
+                        <option value="Senior Security Engineer">Senior Security Engineer</option>
+                        <option value="Penetration Tester">Penetration Tester</option>
+                        <option value="Information Security Analyst">Information Security Analyst</option>
+                        <option value="CISO">CISO (Chief Information Security Officer)</option>
+                        <option value="Security Architect">Security Architect</option>
+                    </optgroup>
+
+                    <optgroup label="🎯 Другое">
+                        <option value="HR Manager">HR Manager</option>
+                        <option value="Recruiter">Recruiter / IT Recruiter</option>
+                        <option value="Technical Writer">Technical Writer</option>
+                        <option value="Documentation Specialist">Documentation Specialist</option>
+                        <option value="System Administrator">System Administrator</option>
+                        <option value="Operations Manager">Operations Manager</option>
+                        <option value="Office Manager">Office Manager</option>
+                        <option value="Financial Analyst">Financial Analyst</option>
+                        <option value="Legal Advisor">Legal Advisor</option>
+                        <option value="Other">Другое</option>
+                    </optgroup>
                 </select>
 
                 <input type="text" name="username" placeholder="Логин *" required>

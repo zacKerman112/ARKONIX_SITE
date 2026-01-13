@@ -84,7 +84,6 @@
             font-size: 0.9em;
         }
 
-        /* Виджет последней переписки */
         .last-chat-widget {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -141,6 +140,18 @@
             background: rgba(56, 189, 248, 0.2);
             color: #38bdf8;
             border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .widget-status-awaiting {
+            background: rgba(129, 140, 248, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+
+        .widget-status-paid {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .widget-last-message {
@@ -205,7 +216,6 @@
             box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
         }
 
-        /* Список обсуждений */
         .discussions-section {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -240,6 +250,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .discussion-service {
@@ -267,10 +279,39 @@
             border: 1px solid rgba(56, 189, 248, 0.3);
         }
 
-        .status-finished {
+        .status-awaiting_confirmation {
+            background: rgba(129, 140, 248, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+
+        .status-paid {
             background: rgba(34, 197, 94, 0.2);
             color: #22c55e;
             border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .discussion-info {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .info-badge {
+            padding: 4px 10px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
+            font-size: 0.85em;
+            color: #94a3b8;
+        }
+
+        .info-badge.price {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            font-weight: 700;
         }
 
         .discussion-link {
@@ -375,9 +416,14 @@
                 <div class="widget-chat-preview">
                     <div class="widget-chat-header">
                         <span class="widget-chat-service">📌 {{ last_chat['service_name'] }}</span>
-                        <span class="widget-status-badge widget-status-{{ last_chat['status'] }}">
-                            {% if last_chat['status'] == 'waiting' %}
-                            ⏳ Ожидает
+                        <span
+                            class="widget-status-badge widget-status-{% if last_chat['payment_status'] == 'paid' %}paid{% elif last_chat['payment_status'] == 'awaiting_confirmation' %}awaiting{% else %}{{ last_chat['status'] }}{% endif %}">
+                            {% if last_chat['payment_status'] == 'paid' %}
+                            ✓ Оплачено
+                            {% elif last_chat['payment_status'] == 'awaiting_confirmation' %}
+                            ⏳ Ожидает подтверждения
+                            {% elif last_chat['status'] == 'waiting' %}
+                            ⏳ Ожидает ответа
                             {% elif last_chat['status'] == 'in_progress' %}
                             🔄 В процессе
                             {% else %}
@@ -391,7 +437,7 @@
                             Последнее сообщение в этом обсуждении
                         </div>
                         <div class="widget-last-message-time">
-                            📅 {{ last_chat['created_at'] if last_chat['created_at'] else 'Недавно' }}
+                            📅 {{ last_chat['created_at'][:16] if last_chat['created_at'] else 'Недавно' }}
                         </div>
                     </div>
 
@@ -420,9 +466,14 @@
             <div class="discussion-card">
                 <div class="discussion-header">
                     <span class="discussion-service">📌 {{ chat['service_name'] }}</span>
-                    <span class="status-badge status-{{ chat['status'] }}">
-                        {% if chat['status'] == 'waiting' %}
-                        ⏳ Ожидает
+                    <span
+                        class="status-badge status-{% if chat['payment_status'] == 'paid' %}paid{% elif chat['payment_status'] == 'awaiting_confirmation' %}awaiting_confirmation{% else %}{{ chat['status'] }}{% endif %}">
+                        {% if chat['payment_status'] == 'paid' %}
+                        ✓ Оплачено
+                        {% elif chat['payment_status'] == 'awaiting_confirmation' %}
+                        ⏳ Ожидает подтверждения оплаты
+                        {% elif chat['status'] == 'waiting' %}
+                        ⏳ Ожидает ответа
                         {% elif chat['status'] == 'in_progress' %}
                         🔄 В процессе
                         {% else %}
@@ -430,6 +481,15 @@
                         {% endif %}
                     </span>
                 </div>
+
+                <div class="discussion-info">
+                    {% if chat['order_price'] %}
+                    <span class="info-badge price">💰 ${{ chat['order_price'] }}</span>
+                    {% endif %}
+                    <span class="info-badge">📅 {{ chat['created_at'][:10] if chat['created_at'] else 'Недавно'
+                        }}</span>
+                </div>
+
                 <a href="/chat/{{ chat['id'] }}" class="discussion-link">
                     Открыть чат →
                 </a>

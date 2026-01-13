@@ -92,6 +92,24 @@
             box-shadow: 0 6px 24px rgba(56, 189, 248, 0.5);
         }
 
+        /* Специальная кнопка для документов сотрудников */
+        .action-btn-docs {
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+        }
+
+        .action-btn-docs:hover {
+            box-shadow: 0 6px 24px rgba(129, 140, 248, 0.5);
+        }
+
+        /* Специальная кнопка для настроек оплаты */
+        .action-btn-payment {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .action-btn-payment:hover {
+            box-shadow: 0 6px 24px rgba(34, 197, 94, 0.5);
+        }
+
         .chats-section {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -378,11 +396,21 @@
         </div>
 
         <div class="admin-actions">
+            <a href="/admin/payment_settings" class="action-btn action-btn-payment">
+                💳 Настройки оплаты
+            </a>
+            <a href="/admin/payments" class="action-btn" style="background: linear-gradient(90deg, #fbbf24, #f59e0b);">
+                💰 История платежей
+            </a>
             <a href="/admin/reviews" class="action-btn">
                 📝 Управление отзывами
             </a>
-            <a href="/admin/team" class="action-btn">
+            <a href="/admin/team" class="action-btn action-btn-docs">
                 👥 Участники команды
+            </a>
+            <a href="/admin/all_documents" class="action-btn"
+                style="background: linear-gradient(90deg, #a78bfa, #c084fc);">
+                📁 Все документы
             </a>
         </div>
 
@@ -432,6 +460,22 @@
                                 {% endif %}
                             </span>
                         </div>
+                        {% if chat['order_price'] %}
+                        <div class="client-info-item">
+                            <span class="client-info-label">Цена:</span>
+                            <span class="client-info-value" style="color: #22c55e; font-weight: 700;">
+                                ${{ chat['order_price'] }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if chat['payment_status'] == 'paid' %}
+                        <div class="client-info-item">
+                            <span
+                                style="background: rgba(34, 197, 94, 0.2); color: #22c55e; padding: 4px 10px; border-radius: 8px; font-weight: 600; font-size: 0.85em;">
+                                ✓ Оплачено
+                            </span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -473,7 +517,7 @@
             <div class="footer-section">
                 <h4>Контакты</h4>
                 <p>Телефон: +38 095 713 66 14</p>
-                <p>Email: itw23265@gmail.com</p>
+                <p>Email: <a href="mailto:arkonix.official@gmail.com">arkonix.official@gmail.com</a></p>
             </div>
 
             <div class="footer-section">

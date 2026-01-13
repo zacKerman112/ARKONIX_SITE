@@ -1,22 +1,34 @@
 import sqlite3
+import os
+
+DB_NAME = "database.db"
 
 
 def init_db():
-    conn = sqlite3.connect("database.db")
+    # Удаляем старую базу если она есть
+    if os.path.exists(DB_NAME):
+        print(f"⚠️ Удаляю старую базу данных {DB_NAME}...")
+        os.remove(DB_NAME)
+        print("✅ Старая база удалена")
+
+    conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
-    # ---------- Пользователи ----------
+    print("⏳ Создаю новую базу данных...")
+
+    # ================= USERS =================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password TEXT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
         email TEXT,
-        role TEXT DEFAULT 'client' -- client, staff, admin
+        role TEXT DEFAULT 'client'
     )
     """)
+    print("✅ Таблица users создана")
 
-    # ---------- Отзывы ----------
+    # ================= REVIEWS =================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS reviews (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,8 +38,9 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+    print("✅ Таблица reviews создана")
 
-    # ---------- Заявки клиентов ----------
+    # ================= REQUESTS =================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS requests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,36 +52,103 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users(id)
     )
     """)
+    print("✅ Таблица requests создана")
 
-    # ---------- Чаты ----------
+    # ================= CHATS =================
+    # ВАЖНО: payment_status может быть:
+    # - 'pending' (ожидает установки цены)
+    # - 'awaiting_confirmation' (клиент подтвердил, ждёт админа)
+    # - 'paid' (админ подтвердил оплату)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        client_id INTEGER,
+        client_id INTEGER NOT NULL,
         staff_id INTEGER,
         service_name TEXT,
-        status TEXT DEFAULT 'waiting', -- waiting, in_progress, finished
+        status TEXT DEFAULT 'waiting',
+        order_price REAL,
+        payment_status TEXT DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (client_id) REFERENCES users(id),
         FOREIGN KEY (staff_id) REFERENCES users(id)
     )
     """)
+    print("✅ Таблица chats создана")
 
-    # ---------- Сообщения ----------
+    # ================= MESSAGES =================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chat_id INTEGER,
-        sender_id INTEGER,
+        chat_id INTEGER NOT NULL,
+        sender_id INTEGER NOT NULL,
         text TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (chat_id) REFERENCES chats(id),
         FOREIGN KEY (sender_id) REFERENCES users(id)
     )
     """)
+    print("✅ Таблица messages создана")
 
-    # ---------- Участники команды ----------
+    # ================= PAYMENTS =================
+    # ВАЖНО: status может быть:
+    # - 'pending' (ожидает подтверждения админом)
+    # - 'completed' (подтверждено админом)
+    # - 'rejected' (отклонено админом)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        chat_id INTEGER NOT NULL,
+        client_id INTEGER NOT NULL,
+        amount REAL NOT NULL,
+        card_number TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (chat_id) REFERENCES chats(id),
+        FOREIGN KEY (client_id) REFERENCES users(id)
+    )
+    """)
+    print("✅ Таблица payments создана")
+
+    # ================= ADMIN BALANCE =================
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admin_balance (
+        admin_id INTEGER PRIMARY KEY,
+        balance REAL DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (admin_id) REFERENCES users(id)
+    )
+    """)
+    print("✅ Таблица admin_balance создана")
+
+    # ================= ADMIN PAYMENT CARD =================
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admin_payment_card (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        admin_id INTEGER UNIQUE,
+        card_number TEXT NOT NULL,
+        card_holder TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (admin_id) REFERENCES users(id)
+    )
+    """)
+    print("✅ Таблица admin_payment_card создана")
+
+    # ================= PAYOUT CARDS =================
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS payout_cards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        admin_id INTEGER UNIQUE NOT NULL,
+        card_number TEXT NOT NULL,
+        card_holder TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (admin_id) REFERENCES users(id)
+    )
+    """)
+    print("✅ Таблица payout_cards создана")
+
+    # ================= TEAM =================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS team_members (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,73 +163,74 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+    print("✅ Таблица team_members создана")
 
-    # ---------- МИГРАЦИЯ: Добавление колонки last_message_at если её нет ----------
-    print("\n🔧 Проверка миграций...")
-    try:
-        cursor.execute("PRAGMA table_info(chats)")
-        columns = [column[1] for column in cursor.fetchall()]
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS staff_documents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        member_id INTEGER NOT NULL,
+        document_name TEXT NOT NULL,
+        document_type TEXT NOT NULL,
+        filename TEXT NOT NULL,
+        description TEXT,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (member_id) REFERENCES team_members(id)
+    )
+    """)
+    print("✅ Таблица staff_documents создана")
 
-        if "last_message_at" not in columns:
-            print("📝 Добавление колонки last_message_at...")
+    # ================= DEFAULT USERS =================
+    print("\n⏳ Создаю пользователей по умолчанию...")
+    users = [
+        ("admin", "admin123", "admin@arkonix.com", "admin"),
+        ("staff", "staff123", "staff@arkonix.com", "staff"),
+        ("client", "client123", "client@example.com", "client"),
+    ]
+
+    for u in users:
+        try:
             cursor.execute(
-                "ALTER TABLE chats ADD COLUMN last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+                "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)",
+                u,
             )
-            # Обновляем существующие записи
-            cursor.execute(
-                "UPDATE chats SET last_message_at = created_at WHERE last_message_at IS NULL"
-            )
-            print("✅ Колонка last_message_at успешно добавлена")
-        else:
-            print("✅ Колонка last_message_at уже существует")
-    except sqlite3.OperationalError as e:
-        print(f"⚠️ Ошибка при миграции: {e}")
+            print(f"  ✅ Создан пользователь: {u[0]} (роль: {u[3]})")
+        except sqlite3.IntegrityError:
+            print(f"  ⚠️ Пользователь {u[0]} уже существует")
 
-    # ---------- СОЗДАНИЕ ТЕСТОВЫХ ПОЛЬЗОВАТЕЛЕЙ ----------
-    print("\n🔧 Создание тестовых пользователей...")
-
-    # Админ
-    try:
-        cursor.execute("""
-            INSERT INTO users (username, password, email, role) 
-            VALUES ('admin', 'admin123', 'admin@arkonix.com', 'admin')
-        """)
-        print("✅ Создан АДМИН: username='admin', password='admin123'")
-    except sqlite3.IntegrityError:
-        print("ℹ️  Админ уже существует")
-
-    # Сотрудник
-    try:
-        cursor.execute("""
-            INSERT INTO users (username, password, email, role) 
-            VALUES ('staff', 'staff123', 'staff@arkonix.com', 'staff')
-        """)
-        print("✅ Создан СОТРУДНИК: username='staff', password='staff123'")
-    except sqlite3.IntegrityError:
-        print("ℹ️  Сотрудник уже существует")
-
-    # Тестовый клиент
-    try:
-        cursor.execute("""
-            INSERT INTO users (username, password, email, role) 
-            VALUES ('client', 'client123', 'client@example.com', 'client')
-        """)
-        print("✅ Создан КЛИЕНТ (для теста): username='client', password='client123'")
-    except sqlite3.IntegrityError:
-        print("ℹ️  Клиент уже существует")
+    # Создаём баланс для админа
+    cursor.execute("SELECT id FROM users WHERE role='admin'")
+    admin = cursor.fetchone()
+    if admin:
+        cursor.execute(
+            "INSERT OR IGNORE INTO admin_balance (admin_id, balance) VALUES (?, 0)",
+            (admin[0],),
+        )
+        print("  ✅ Создан баланс для администратора")
 
     conn.commit()
     conn.close()
 
-    print("\n" + "=" * 60)
-    print("✅ База данных успешно инициализирована!")
-    print("📋 Созданы таблицы: users, reviews, requests, chats, messages")
-    print("=" * 60)
-    print("\n👥 АККАУНТЫ ДЛЯ ВХОДА:")
-    print("   🛡️  АДМИН:     username='admin'  password='admin123'")
-    print("   👔 СОТРУДНИК: username='staff'  password='staff123'")
-    print("   👤 КЛИЕНТ:    username='client' password='client123'")
-    print("=" * 60 + "\n")
+    print("\n" + "=" * 50)
+    print("🎉 База данных успешно создана!")
+    print("=" * 50)
+    print("\n📝 Данные для входа:")
+    print("  Администратор:")
+    print("    Логин: admin")
+    print("    Пароль: admin123")
+    print("\n  Клиент:")
+    print("    Логин: client")
+    print("    Пароль: client123")
+    print("\n  Сотрудник:")
+    print("    Логин: staff")
+    print("    Пароль: staff123")
+    print("\n💡 Важная информация:")
+    print("  📊 Таблица payments: хранит все платежи")
+    print("     - status: pending | completed | rejected")
+    print("  💰 Таблица chats.payment_status:")
+    print("     - pending: ожидает установки цены")
+    print("     - awaiting_confirmation: клиент подтвердил, ждёт админа")
+    print("     - paid: админ подтвердил оплату")
+    print("=" * 50)
 
 
 if __name__ == "__main__":

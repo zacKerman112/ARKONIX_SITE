@@ -44,6 +44,7 @@
       color: #e5e7eb;
       font-size: 1em;
       transition: all 0.3s;
+      box-sizing: border-box;
     }
 
     .form-group input:focus {
@@ -93,6 +94,7 @@
       margin: 25px 0;
       color: #64748b;
       position: relative;
+      font-size: 0.9em;
     }
 
     .divider::before,
@@ -113,21 +115,46 @@
       right: 0;
     }
 
-    .staff-register-link {
-      display: block;
-      text-align: center;
-      padding: 12px;
-      background: rgba(129, 140, 248, 0.1);
-      border: 1px solid rgba(129, 140, 248, 0.3);
-      border-radius: 10px;
-      color: #818cf8;
-      text-decoration: none;
+    .staff-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
       margin-top: 20px;
+    }
+
+    .staff-login-link,
+    .staff-register-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
       transition: all 0.3s;
+      font-size: 0.95em;
+    }
+
+    .staff-login-link {
+      background: linear-gradient(90deg, #818cf8, #a78bfa);
+      color: #020617;
+      box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
+    }
+
+    .staff-login-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(129, 140, 248, 0.5);
+    }
+
+    .staff-register-link {
+      background: rgba(129, 140, 248, 0.15);
+      border: 2px solid rgba(129, 140, 248, 0.3);
+      color: #818cf8;
     }
 
     .staff-register-link:hover {
-      background: rgba(129, 140, 248, 0.2);
+      background: rgba(129, 140, 248, 0.25);
       border-color: #818cf8;
       transform: translateY(-2px);
     }
@@ -147,6 +174,12 @@
       border: 1px solid rgba(239, 68, 68, 0.3);
       color: #ef4444;
     }
+
+    @media (max-width: 480px) {
+      .staff-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
@@ -163,6 +196,7 @@
       </nav>
       <div class="user-panel">
         <a href="/register">Регистрация</a>
+        <a href="/staff/login">👔 Сотрудники</a>
       </div>
     </div>
   </header>
@@ -198,11 +232,18 @@
       <a href="/register">Нет аккаунта? Зарегистрироваться</a>
     </div>
 
-    <div class="divider">или</div>
+    <div class="divider">для сотрудников</div>
 
-    <a href="/staff/register" class="staff-register-link">
-      👔 Регистрация для сотрудников
-    </a>
+    <div class="staff-buttons">
+      <a href="/staff/login" class="staff-login-link">
+        <span>🔐</span>
+        <span>Вход</span>
+      </a>
+      <a href="/staff/register" class="staff-register-link">
+        <span>📝</span>
+        <span>Регистрация</span>
+      </a>
+    </div>
   </div>
 </body>
 

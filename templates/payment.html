@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Оплата заказа - ARKONIX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .payment-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            margin: 0 auto 20px;
+        }
+
+        .payment-header h1 {
+            font-size: 2em;
+            font-weight: 800;
+            color: #e5e7eb;
+            margin-bottom: 8px;
+        }
+
+        .payment-header p {
+            color: #94a3b8;
+            font-size: 1.05em;
+        }
+
+        .order-summary {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .order-summary h3 {
+            color: #cbd5f5;
+            font-weight: 700;
+            margin-bottom: 16px;
+            font-size: 1.1em;
+        }
+
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #cbd5f5;
+        }
+
+        .order-info:last-child {
+            border-bottom: none;
+            padding-top: 16px;
+            margin-top: 8px;
+            border-top: 2px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .order-info .label {
+            color: #94a3b8;
+        }
+
+        .order-info .value {
+            font-weight: 600;
+        }
+
+        .total-price {
+            font-size: 1.8em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .payment-details {
+            background: rgba(56, 189, 248, 0.05);
+            border: 2px solid rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .payment-details h3 {
+            color: #38bdf8;
+            font-weight: 700;
+            margin-bottom: 16px;
+            font-size: 1.1em;
+        }
+
+        .card-info {
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card-number {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #e5e7eb;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .card-holder {
+            color: #94a3b8;
+            font-size: 0.95em;
+        }
+
+        .card-holder span {
+            color: #cbd5f5;
+            font-weight: 600;
+        }
+
+        .payment-instructions {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            color: #fbbf24;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .payment-instructions strong {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .awaiting-confirmation {
+            background: rgba(129, 140, 248, 0.1);
+            border: 2px solid rgba(129, 140, 248, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .awaiting-confirmation h3 {
+            color: #818cf8;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .awaiting-confirmation p {
+            color: #cbd5f5;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(129, 140, 248, 0.2);
+            border-top-color: #818cf8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+        }
+
+        .btn-primary:disabled {
+            background: rgba(100, 116, 139, 0.3);
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: rgba(100, 116, 139, 0.2);
+            color: #cbd5f5;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100, 116, 139, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .pending-note {
+            background: rgba(129, 140, 248, 0.05);
+            border: 1px solid rgba(129, 140, 248, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+            color: #94a3b8;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            .payment-container {
+                padding: 24px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .card-number {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <div class="payment-icon">💳</div>
+            <h1>Оплата заказа</h1>
+            <p>Переведите средства на указанную карту</p>
+        </div>
+
+        {% if admin_card %}
+
+        <!-- Если оплата ожидает подтверждения -->
+        {% if chat.payment_status == 'awaiting_confirmation' %}
+        <div class="awaiting-confirmation">
+            <div class="spinner"></div>
+            <h3>⏳ Ожидается подтверждение</h3>
+            <p>
+                Ваша заявка на оплату отправлена администратору.<br>
+                Платёж будет подтверждён в течение 24 часов.
+            </p>
+            <p style="color: #64748b; font-size: 0.9em;">
+                Вы получите уведомление после проверки платежа.
+            </p>
+        </div>
+        <div class="action-buttons">
+            <a href="/chat/{{ chat.id }}" class="btn btn-secondary">← Вернуться к чату</a>
+        </div>
+
+        <!-- Обычная страница оплаты -->
+        {% else %}
+        <div class="order-summary">
+            <h3>📋 Детали заказа</h3>
+            <div class="order-info">
+                <span class="label">Услуга:</span>
+                <span class="value">{{ chat.service_name }}</span>
+            </div>
+            <div class="order-info">
+                <span class="label">Номер заказа:</span>
+                <span class="value">#{{ chat.id }}</span>
+            </div>
+            <div class="order-info">
+                <span class="label">К оплате:</span>
+                <span class="total-price">{{ chat.order_price }} $</span>
+            </div>
+        </div>
+
+        <div class="payment-details">
+            <h3>💰 Реквизиты для перевода</h3>
+            <div class="card-info">
+                <div class="card-number">{{ admin_card.card_number }}</div>
+                <div class="card-holder">
+                    Получатель: <span>{{ admin_card.card_holder }}</span>
+                </div>
+            </div>
+            <div class="payment-instructions">
+                <strong>⚠️ Важно:</strong>
+                Переведите точную сумму {{ chat.order_price }} $ на указанную карту, затем нажмите кнопку "Подтвердить
+                оплату". Администратор проверит платеж в течение 24 часов.
+            </div>
+        </div>
+
+        <form method="POST" action="/payment/confirm/{{ chat.id }}">
+            <div class="action-buttons">
+                <a href="/chat/{{ chat.id }}" class="btn btn-secondary">← Назад</a>
+                <button type="submit" class="btn btn-primary">✓ Подтвердить оплату</button>
+            </div>
+            <div class="pending-note">
+                После подтверждения кнопка станет неактивной до проверки администратором
+            </div>
+        </form>
+        {% endif %}
+
+        {% else %}
+        <div class="error-message">
+            ❌ Карта для приема платежей не настроена. Обратитесь к администратору.
+        </div>
+        <div class="action-buttons">
+            <a href="/chat/{{ chat.id }}" class="btn btn-secondary">← Вернуться к чату</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

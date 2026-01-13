@@ -31,6 +31,50 @@
       transform: translateY(-2px);
     }
 
+    .staff-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .staff-login-link,
+    .staff-register-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.3s;
+      font-size: 0.95em;
+    }
+
+    .staff-login-link {
+      background: linear-gradient(90deg, #818cf8, #a78bfa);
+      color: #020617;
+      box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
+    }
+
+    .staff-login-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(129, 140, 248, 0.5);
+    }
+
+    .staff-register-link {
+      background: rgba(129, 140, 248, 0.15);
+      border: 2px solid rgba(129, 140, 248, 0.3);
+      color: #818cf8;
+    }
+
+    .staff-register-link:hover {
+      background: rgba(129, 140, 248, 0.25);
+      border-color: #818cf8;
+      transform: translateY(-2px);
+    }
+
     .divider {
       text-align: center;
       margin: 20px 0;
@@ -79,6 +123,12 @@
       border: 1px solid rgba(34, 197, 94, 0.3);
       color: #22c55e;
     }
+
+    @media (max-width: 480px) {
+      .staff-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
@@ -108,12 +158,16 @@
 
       <p class="auth-switch">Уже есть аккаунт? <a href="/login">Войти</a></p>
 
-      <div class="divider">или</div>
+      <div class="divider">для сотрудников</div>
 
-      <div class="staff-link">
-        <a href="/staff/register">
-          <span>👔</span>
-          <span>Регистрация для сотрудников</span>
+      <div class="staff-buttons">
+        <a href="/staff/login" class="staff-login-link">
+          <span>🔐</span>
+          <span>Вход</span>
+        </a>
+        <a href="/staff/register" class="staff-register-link">
+          <span>📝</span>
+          <span>Регистрация</span>
         </a>
       </div>
     </div>

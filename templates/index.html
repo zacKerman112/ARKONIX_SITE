@@ -7,6 +7,11 @@
     <title>ARKONIX - Разработка веб-приложений и AI-решений</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
+        /* ДОБАВЛЕНО: Плавная прокрутка */
+        html {
+            scroll-behavior: smooth;
+        }
+
         /* Красивые звёзды для отзывов */
         .stars {
             display: inline-flex !important;
@@ -491,7 +496,8 @@
         </div>
     </section>
 
-    <section class="add-review">
+    <!-- ВАЖНО: Добавлен id="reviews" для якоря -->
+    <section class="add-review" id="reviews">
         <div class="container add-review-grid">
             <div class="review-form">
                 <h2>Оставить отзыв</h2>

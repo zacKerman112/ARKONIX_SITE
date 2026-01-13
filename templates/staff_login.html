@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход для сотрудников - ARKONIX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin-top: 80px;
+        }
+
+        .auth-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px;
+            max-width: 500px;
+            width: 100%;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(129, 140, 248, 0.4);
+        }
+
+        .auth-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+            font-weight: 900;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-header p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #cbd5f5;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(2, 6, 23, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #e5e7eb;
+            font-size: 1em;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #818cf8;
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.1);
+            background: rgba(2, 6, 23, 0.8);
+        }
+
+        .form-group input::placeholder {
+            color: #64748b;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            color: #020617;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(129, 140, 248, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(129, 140, 248, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .flash-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .flash-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 2px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 15px;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .auth-links a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .auth-links a:hover {
+            background: rgba(129, 140, 248, 0.1);
+            transform: translateX(5px);
+        }
+
+        .back-to-home {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-to-home a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .back-to-home a:hover {
+            background: rgba(148, 163, 184, 0.1);
+            color: #cbd5f5;
+        }
+
+        .info-box {
+            background: rgba(129, 140, 248, 0.1);
+            border: 2px solid rgba(129, 140, 248, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .info-box-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .info-box-text {
+            color: #cbd5f5;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .info-box-text strong {
+            color: #818cf8;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 35px 25px;
+            }
+
+            .auth-header h1 {
+                font-size: 1.6em;
+            }
+
+            .auth-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+
+            .auth-header h1 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="/" style="color: inherit; text-decoration: none;">ARKONIX</a>
+            </div>
+
+            <nav class="nav">
+                <a href="/">Главная</a>
+                <a href="/services">Услуги</a>
+                <a href="/team">Команда</a>
+            </nav>
+
+            <div class="user-panel">
+                <a href="/login">Вход клиентов</a>
+                <a href="/register">Регистрация</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div
+                class="flash-message {% if 'успешно' in message.lower() or 'одобрен' in message.lower() %}flash-success{% else %}flash-error{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <div class="auth-header">
+                <div class="auth-icon">👔</div>
+                <h1>Вход для сотрудников</h1>
+                <p>Войдите в свой личный кабинет</p>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-icon">🔐</div>
+                <div class="info-box-text">
+                    Эта страница только для <strong>зарегистрированных сотрудников</strong> ARKONIX.<br>
+                    Используйте логин и пароль, которые вы указали при регистрации.
+                </div>
+            </div>
+
+            <form method="post" action="/staff/login">
+                <div class="form-group">
+                    <label for="username">Логин</label>
+                    <input type="text" id="username" name="username" placeholder="Введите ваш логин" required
+                        autocomplete="username" autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password" placeholder="Введите ваш пароль" required
+                        autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Войти в личный кабинет
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>или</span>
+            </div>
+
+            <div class="auth-links">
+                <a href="/staff/register">
+                    📝 Зарегистрироваться как сотрудник →
+                </a>
+            </div>
+
+            <div class="back-to-home">
+                <a href="/">
+                    ← Вернуться на главную
+                </a>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                <div style="text-align: center; color: #64748b; font-size: 0.9em;">
+                    <p style="margin: 0 0 10px 0;">Вы клиент?</p>
+                    <a href="/login" style="color: #38bdf8; text-decoration: none; font-weight: 600;">
+                        Войти как клиент →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>Телефон: +38 095 713 66 14</p>
+                <p>Email: itw23265@gmail.com</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Соцсети</h4>
+                <a href="https://t.me/worldit23">Telegram</a><br>
+                <a href="https://discord.gg/uKzRMmshnp">Discord</a>
+            </div>
+
+            <div class="footer-section">
+                <a href="/terms">Условия использования</a>
+                <a href="/privacy">Политика и правила</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
+        </div>
+    </footer>
+
+</body>
+
+</html>

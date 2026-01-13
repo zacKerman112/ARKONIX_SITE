@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет сотрудника - ARKONIX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Бургер-меню */
+        .burger-menu {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 10px;
+        }
+
+        .burger-line {
+            width: 28px;
+            height: 3px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .burger-menu:hover .burger-line {
+            background: linear-gradient(90deg, #818cf8, #38bdf8);
+        }
+
+        .burger-menu.active .burger-line:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .burger-menu.active .burger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .burger-menu.active .burger-line:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .staff-container {
+            max-width: 1200px;
+            margin: 100px auto 50px;
+            padding: 20px;
+        }
+
+        .staff-header {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: #020617;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(56, 189, 248, 0.3);
+        }
+
+        .staff-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 900;
+        }
+
+        .staff-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .profile-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8;
+            box-shadow: 0 10px 40px rgba(56, 189, 248, 0.2);
+        }
+
+        .profile-card h2 {
+            margin: 0 0 25px 0;
+            font-size: 1.8em;
+            color: #38bdf8;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .info-value {
+            color: #e5e7eb;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .status-approved {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .documents-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 40px;
+        }
+
+        .documents-section h2 {
+            margin: 0 0 25px 0;
+            font-size: 1.8em;
+            color: #38bdf8;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .document-item {
+            background: rgba(2, 6, 23, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .document-item:hover {
+            border-color: #38bdf8;
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(56, 189, 248, 0.15);
+        }
+
+        .document-info {
+            flex: 1;
+        }
+
+        .document-name {
+            color: #e5e7eb;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .document-meta {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            color: #020617;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: #38bdf8;
+        }
+
+        .upload-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px dashed rgba(56, 189, 248, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            transition: all 0.3s;
+        }
+
+        .upload-section:hover {
+            border-color: #38bdf8;
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .upload-section h2 {
+            margin: 0 0 20px 0;
+            font-size: 1.8em;
+            color: #38bdf8;
+            font-weight: 800;
+        }
+
+        .upload-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            color: #cbd5f5;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #e5e7eb;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 14px;
+            background: rgba(56, 189, 248, 0.15);
+            border: 2px dashed rgba(56, 189, 248, 0.3);
+            border-radius: 10px;
+            color: #38bdf8;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .file-input-label:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: #38bdf8;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #94a3b8;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .flash-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .flash-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 968px) {
+            .burger-menu {
+                display: flex !important;
+            }
+
+            .nav {
+                position: fixed !important;
+                top: 0 !important;
+                right: -100% !important;
+                width: 320px !important;
+                max-width: 85vw !important;
+                height: 100vh !important;
+                background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+                flex-direction: column !important;
+                padding: 90px 25px 30px !important;
+                gap: 0 !important;
+                z-index: 1000 !important;
+                transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.7) !important;
+                overflow-y: auto !important;
+            }
+
+            .nav.active {
+                right: 0 !important;
+            }
+
+            .nav a {
+                padding: 18px 20px !important;
+                margin: 8px 0 !important;
+                border-radius: 12px !important;
+                background: rgba(56, 189, 248, 0.08) !important;
+                border: 1px solid rgba(56, 189, 248, 0.15) !important;
+                transition: all 0.3s ease !important;
+                font-size: 1.1em !important;
+                text-align: left !important;
+            }
+
+            .user-panel {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: -100% !important;
+                right: auto !important;
+                width: 100% !important;
+                background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+                padding: 25px 20px 30px !important;
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 12px !important;
+                z-index: 1000 !important;
+                transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+                border-top: 3px solid rgba(56, 189, 248, 0.3) !important;
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.7) !important;
+            }
+
+            .user-panel.active {
+                left: 0 !important;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                justify-content: space-between !important;
+            }
+
+            .logo {
+                z-index: 1001 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .staff-header h1 {
+                font-size: 2em;
+            }
+
+            .document-item {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .document-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .document-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="/" style="color: inherit; text-decoration: none;">ARKONIX</a>
+            </div>
+
+            <div class="burger-menu" id="burgerMenu">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </div>
+
+            <nav class="nav" id="nav">
+                <a href="/">Главная</a>
+                <a href="/services">Услуги</a>
+                <a href="/team">Команда</a>
+                <a href="/discussions">Обсуждения</a>
+            </nav>
+
+            <div class="user-panel" id="userPanel">
+                <a href="/staff/profile">Мой кабинет</a>
+                <a href="/logout">Выход</a>
+            </div>
+        </div>
+        <div class="menu-overlay" id="menuOverlay"></div>
+    </header>
+
+    <div class="staff-container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div
+            class="flash-message {% if 'успешно' in message.lower() or 'отправлен' in message.lower() %}flash-success{% else %}flash-error{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="staff-header">
+            <h1>👤 Личный кабинет сотрудника</h1>
+            <p>Добро пожаловать, {{ member.first_name }} {{ member.last_name }}!</p>
+        </div>
+
+        <div class="profile-grid">
+            <div class="profile-card">
+                <h2>📋 Личные данные</h2>
+                <div class="info-row">
+                    <span class="info-label">Имя:</span>
+                    <span class="info-value">{{ member.first_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Фамилия:</span>
+                    <span class="info-value">{{ member.last_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Должность:</span>
+                    <span class="info-value">{{ member.position }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ member.email or 'Не указан' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Логин:</span>
+                    <span class="info-value">{{ member.username }}</span>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <h2>📊 Статус</h2>
+                <div class="info-row">
+                    <span class="info-label">Статус регистрации:</span>
+                    <span class="info-value">
+                        {% if member.status == 'pending' %}
+                        <span class="status-badge status-pending">⏳ Ожидает одобрения</span>
+                        {% elif member.status == 'approved' %}
+                        <span class="status-badge status-approved">✅ Одобрено</span>
+                        {% else %}
+                        <span class="status-badge status-rejected">❌ Отклонено</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Дата регистрации:</span>
+                    <span class="info-value">{{ member.created_at[:16] }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">ID участника:</span>
+                    <span class="info-value">#{{ member.id }}</span>
+                </div>
+                {% if member.status == 'pending' %}
+                <div
+                    style="margin-top: 20px; padding: 15px; background: rgba(251, 191, 36, 0.1); border-radius: 10px; border-left: 3px solid #fbbf24;">
+                    <p style="margin: 0; color: #fbbf24; font-size: 0.95em;">
+                        ⏳ Ваша заявка на рассмотрении у администратора. После одобрения вы получите полный доступ к
+                        функциям команды.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="documents-section">
+            <h2>📁 Мои документы</h2>
+
+            {% if documents %}
+            {% for doc in documents %}
+            <div class="document-item">
+                <div class="document-info">
+                    <div class="document-name">
+                        {% if doc.document_type == 'contract' %}
+                        📄 Договор о участии
+                        {% else %}
+                        📎 {{ doc.document_name or 'Документ' }}
+                        {% endif %}
+                    </div>
+                    <div class="document-meta">
+                        Загружен: {{ doc.uploaded_at[:16] }}
+                        {% if doc.description %}
+                        <br>Описание: {{ doc.description }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="document-actions">
+                    <a href="/staff/document/view/{{ doc.id }}" class="btn btn-secondary" target="_blank">
+                        👁️ Просмотр
+                    </a>
+                    <a href="/staff/document/download/{{ doc.id }}" class="btn btn-primary">
+                        ⬇️ Скачать
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3>Документы не загружены</h3>
+                <p>У вас пока нет загруженных документов</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="upload-section">
+            <h2>📤 Загрузить новый документ</h2>
+            <p style="color: #94a3b8; margin-bottom: 30px;">Вы можете загружать дополнительные документы для
+                администратора</p>
+
+            <form method="post" action="/staff/upload_document" enctype="multipart/form-data" class="upload-form">
+                <div class="form-group">
+                    <label>Название документа:</label>
+                    <input type="text" name="document_name" placeholder="Например: Паспорт, Сертификат..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Тип документа:</label>
+                    <select name="document_type" required>
+                        <option value="">Выберите тип</option>
+                        <option value="passport">Паспорт</option>
+                        <option value="certificate">Сертификат</option>
+                        <option value="diploma">Диплом</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Описание (необязательно):</label>
+                    <textarea name="description" placeholder="Краткое описание документа..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Файл документа:</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="document" id="documentFile" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                            required onchange="updateFileName(this)">
+                        <label for="documentFile" class="file-input-label">
+                            📎 Выберите файл (PDF, DOC, DOCX, JPG, PNG)
+                        </label>
+                        <div class="file-name" id="fileName"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 1.1em;">
+                    📤 Отправить документ администратору
+                </button>
+            </form>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/logout" class="btn btn-secondary" style="padding: 14px 40px;">
+                🚪 Выйти из аккаунта
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>Телефон: +38 095 713 66 14</p>
+                <p>Email: itw23265@gmail.com</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Соцсети</h4>
+                <a href="https://t.me/worldit23">Telegram</a><br>
+                <a href="https://discord.gg/uKzRMmshnp">Discord</a>
+            </div>
+
+            <div class="footer-section">
+                <a href="/terms">Условия использования</a>
+                <a href="/privacy">Политика и правила</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
+        </div>
+    </footer>
+
+    <script>
+        // Бургер-меню
+        document.addEventListener('DOMContentLoaded', function () {
+            const burgerMenu = document.getElementById('burgerMenu');
+            const nav = document.getElementById('nav');
+            const userPanel = document.getElementById('userPanel');
+            const menuOverlay = document.getElementById('menuOverlay');
+
+            if (burgerMenu) {
+                function toggleMenu() {
+                    burgerMenu.classList.toggle('active');
+                    nav.classList.toggle('active');
+                    if (userPanel) userPanel.classList.toggle('active');
+                    menuOverlay.classList.toggle('active');
+                    document.body.style.overflow = burgerMenu.classList.contains('active') ? 'hidden' : '';
+                }
+
+                burgerMenu.addEventListener('click', toggleMenu);
+                menuOverlay.addEventListener('click', toggleMenu);
+
+                nav.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth <= 968) {
+                            toggleMenu();
+                        }
+                    });
+                });
+
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 968 && burgerMenu.classList.contains('active')) {
+                        toggleMenu();
+                    }
+                });
+            }
+        });
+
+        // Обновление имени файла
+        function updateFileName(input) {
+            const fileNameDiv = document.getElementById('fileName');
+            if (input.files && input.files[0]) {
+                fileNameDiv.textContent = '📄 Выбран файл: ' + input.files[0].name;
+            } else {
+                fileNameDiv.textContent = '';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
