@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
-
+{% extends "base.html" %}
+{% block title %}Личный кабинет - ARKONIX{% endblock %}
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <title>Личный кабинет - ARKONIX</title>
@@ -123,8 +125,14 @@
             font-size: 1.1em;
         }
 
+        .widget-status-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
         .widget-status-badge {
-            padding: 4px 10px;
+            padding: 6px 12px;
             border-radius: 12px;
             font-size: 0.8em;
             font-weight: 600;
@@ -142,16 +150,28 @@
             border: 1px solid rgba(56, 189, 248, 0.3);
         }
 
+        .widget-status-completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
         .widget-status-awaiting {
-            background: rgba(129, 140, 248, 0.2);
-            color: #818cf8;
-            border: 1px solid rgba(129, 140, 248, 0.3);
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
         }
 
         .widget-status-paid {
             background: rgba(34, 197, 94, 0.2);
             color: #22c55e;
             border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .widget-status-pending {
+            background: rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.3);
         }
 
         .widget-last-message {
@@ -238,6 +258,13 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 15px;
             transition: all 0.3s;
+            position: relative;
+        }
+
+        /* Разные цвета для разных статусов */
+        .discussion-card.completed {
+            border-color: rgba(34, 197, 94, 0.3);
+            background: rgba(34, 197, 94, 0.05);
         }
 
         .discussion-card:hover {
@@ -260,6 +287,13 @@
             font-size: 1.1em;
         }
 
+        .status-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
         .status-badge {
             padding: 6px 12px;
             border-radius: 15px;
@@ -267,6 +301,7 @@
             font-weight: 600;
         }
 
+        /* Статусы чата */
         .status-waiting {
             background: rgba(251, 191, 36, 0.2);
             color: #fbbf24;
@@ -279,16 +314,44 @@
             border: 1px solid rgba(56, 189, 248, 0.3);
         }
 
-        .status-awaiting_confirmation {
-            background: rgba(129, 140, 248, 0.2);
-            color: #818cf8;
-            border: 1px solid rgba(129, 140, 248, 0.3);
-        }
-
-        .status-paid {
+        .status-completed {
             background: rgba(34, 197, 94, 0.2);
             color: #22c55e;
             border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        /* Статусы оплаты */
+        .payment-pending {
+            background: rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .payment-awaiting {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .payment-paid {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .completed-notice {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            color: #22c55e;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
         }
 
         .discussion-info {
@@ -314,10 +377,16 @@
             font-weight: 700;
         }
 
+        .discussion-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
         .discussion-link {
             display: inline-block;
-            margin-top: 10px;
-            padding: 8px 16px;
+            padding: 10px 20px;
             background: linear-gradient(90deg, #38bdf8, #818cf8);
             color: #020617;
             text-decoration: none;
@@ -330,6 +399,23 @@
         .discussion-link:hover {
             transform: translateY(-2px);
             box-shadow: 0 3px 12px rgba(56, 189, 248, 0.3);
+        }
+
+        .payment-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .payment-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 12px rgba(34, 197, 94, 0.3);
         }
 
         .empty-discussions {
@@ -416,21 +502,43 @@
                 <div class="widget-chat-preview">
                     <div class="widget-chat-header">
                         <span class="widget-chat-service">📌 {{ last_chat['service_name'] }}</span>
-                        <span
-                            class="widget-status-badge widget-status-{% if last_chat['payment_status'] == 'paid' %}paid{% elif last_chat['payment_status'] == 'awaiting_confirmation' %}awaiting{% else %}{{ last_chat['status'] }}{% endif %}">
+
+                        <!-- СТАТУСЫ -->
+                        <div class="widget-status-badges">
+                            <!-- Статус чата -->
+                            <span class="widget-status-badge widget-status-{{ last_chat['status'] }}">
+                                {% if last_chat['status'] == 'waiting' %}
+                                ⏳ Ожидает
+                                {% elif last_chat['status'] == 'in_progress' %}
+                                🔄 В процессе
+                                {% elif last_chat['status'] == 'completed' %}
+                                ✅ Завершено
+                                {% endif %}
+                            </span>
+
+                            <!-- Статус оплаты -->
                             {% if last_chat['payment_status'] == 'paid' %}
-                            ✓ Оплачено
+                            <span class="widget-status-badge widget-status-paid">
+                                💰 Оплачено
+                            </span>
                             {% elif last_chat['payment_status'] == 'awaiting_confirmation' %}
-                            ⏳ Ожидает подтверждения
-                            {% elif last_chat['status'] == 'waiting' %}
-                            ⏳ Ожидает ответа
-                            {% elif last_chat['status'] == 'in_progress' %}
-                            🔄 В процессе
-                            {% else %}
-                            ✅ Завершено
+                            <span class="widget-status-badge widget-status-awaiting">
+                                ⏰ Ожидает
+                            </span>
+                            {% elif last_chat['order_price'] %}
+                            <span class="widget-status-badge widget-status-pending">
+                                💳 Не оплачено
+                            </span>
                             {% endif %}
-                        </span>
+                        </div>
                     </div>
+
+                    {% if last_chat['status'] == 'completed' %}
+                    <div class="completed-notice">
+                        <span>✅</span>
+                        <span>Чат завершён администратором</span>
+                    </div>
+                    {% endif %}
 
                     <div class="widget-last-message">
                         <div class="widget-last-message-text">
@@ -442,7 +550,11 @@
                     </div>
 
                     <a href="/chat/{{ last_chat['id'] }}" class="widget-chat-link">
-                        Продолжить диалог →
+                        {% if last_chat['status'] == 'completed' %}
+                        👁️ Просмотреть историю →
+                        {% else %}
+                        💬 Продолжить диалог →
+                        {% endif %}
                     </a>
                 </div>
                 {% else %}
@@ -459,28 +571,50 @@
 
         <!-- Все обсуждения -->
         <div class="discussions-section">
-            <h2>📋 Мои обсуждения</h2>
+            <h2>📋 Мои обсуждения ({{ chats|length }})</h2>
 
             {% if chats %}
             {% for chat in chats %}
-            <div class="discussion-card">
+            <div class="discussion-card {% if chat['status'] == 'completed' %}completed{% endif %}">
                 <div class="discussion-header">
                     <span class="discussion-service">📌 {{ chat['service_name'] }}</span>
-                    <span
-                        class="status-badge status-{% if chat['payment_status'] == 'paid' %}paid{% elif chat['payment_status'] == 'awaiting_confirmation' %}awaiting_confirmation{% else %}{{ chat['status'] }}{% endif %}">
+
+                    <!-- СТАТУСЫ -->
+                    <div class="status-badges">
+                        <!-- Статус чата -->
+                        <span class="status-badge status-{{ chat['status'] }}">
+                            {% if chat['status'] == 'waiting' %}
+                            ⏳ Ожидает ответа
+                            {% elif chat['status'] == 'in_progress' %}
+                            🔄 В процессе
+                            {% elif chat['status'] == 'completed' %}
+                            ✅ Завершено
+                            {% endif %}
+                        </span>
+
+                        <!-- Статус оплаты -->
                         {% if chat['payment_status'] == 'paid' %}
-                        ✓ Оплачено
+                        <span class="status-badge payment-paid">
+                            💰 Оплачено
+                        </span>
                         {% elif chat['payment_status'] == 'awaiting_confirmation' %}
-                        ⏳ Ожидает подтверждения оплаты
-                        {% elif chat['status'] == 'waiting' %}
-                        ⏳ Ожидает ответа
-                        {% elif chat['status'] == 'in_progress' %}
-                        🔄 В процессе
-                        {% else %}
-                        ✅ Завершено
+                        <span class="status-badge payment-awaiting">
+                            ⏰ Ожидает подтверждения
+                        </span>
+                        {% elif chat['order_price'] %}
+                        <span class="status-badge payment-pending">
+                            💳 Не оплачено
+                        </span>
                         {% endif %}
-                    </span>
+                    </div>
                 </div>
+
+                {% if chat['status'] == 'completed' %}
+                <div class="completed-notice">
+                    <span>✅</span>
+                    <span>Этот чат был завершён администратором</span>
+                </div>
+                {% endif %}
 
                 <div class="discussion-info">
                     {% if chat['order_price'] %}
@@ -490,9 +624,22 @@
                         }}</span>
                 </div>
 
-                <a href="/chat/{{ chat['id'] }}" class="discussion-link">
-                    Открыть чат →
-                </a>
+                <div class="discussion-actions">
+                    <a href="/chat/{{ chat['id'] }}" class="discussion-link">
+                        {% if chat['status'] == 'completed' %}
+                        👁️ Просмотреть историю
+                        {% else %}
+                        💬 Открыть чат
+                        {% endif %}
+                    </a>
+
+                    {% if chat['order_price'] and chat['payment_status'] == 'pending' and chat['status'] != 'completed'
+                    %}
+                    <a href="/payment/{{ chat['id'] }}" class="payment-link">
+                        💳 Оплатить заказ
+                    </a>
+                    {% endif %}
+                </div>
             </div>
             {% endfor %}
             {% else %}
@@ -539,6 +686,17 @@
             &copy; 2025 ARKONIX. Все права защищены.
         </div>
     </footer>
+
+    <script>
+        // Автообновление страницы каждые 30 секунд для получения актуальных статусов
+        setInterval(() => {
+            // Проверяем, есть ли активные чаты (не завершенные)
+            const hasActiveChats = document.querySelectorAll('.discussion-card:not(.completed)').length > 0;
+            if (hasActiveChats) {
+                location.reload();
+            }
+        }, 30000);
+    </script>
 
 </body>
 

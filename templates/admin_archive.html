@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% extends "base.html" %}
+{% block title %}Архив компании - ARKONIX{% endblock %}
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Архив компании - ARKONIX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .archive-container {
+            max-width: 1200px;
+            margin: 100px auto 50px;
+            padding: 20px;
+        }
+
+        .archive-header {
+            background: linear-gradient(90deg, #a78bfa, #c084fc);
+            color: #020617;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.2);
+        }
+
+        .archive-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 900;
+        }
+
+        .archive-header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .archive-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-item h4 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .stat-item p {
+            margin: 5px 0 0 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .controls-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .controls-section h2 {
+            margin-top: 0;
+            color: #a78bfa;
+            margin-bottom: 20px;
+        }
+
+        .upload-form {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: #cbd5f5;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            background: rgba(2, 6, 23, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            color: #e5e7eb;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.2);
+        }
+
+        .form-group textarea {
+            grid-column: 1 / -1;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .file-input-wrapper {
+            grid-column: 1 / -1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(167, 139, 250, 0.1);
+            border: 2px dashed rgba(167, 139, 250, 0.5);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .file-label:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+        }
+
+        .file-name {
+            color: #cbd5f5;
+            font-size: 0.9em;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #a78bfa, #c084fc);
+            color: #020617;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.85em;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            background: transparent;
+            color: #a78bfa;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 0.9em;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.2);
+        }
+
+        .documents-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .documents-section h2 {
+            margin-top: 0;
+            color: #a78bfa;
+            margin-bottom: 25px;
+        }
+
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .document-card {
+            background: rgba(2, 6, 23, 0.4);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .document-card:hover {
+            border-color: #a78bfa;
+            box-shadow: 0 0 30px rgba(167, 139, 250, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .document-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(167, 139, 250, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            margin-bottom: 12px;
+        }
+
+        .document-title {
+            color: #e5e7eb;
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .document-category {
+            display: inline-block;
+            background: rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            width: fit-content;
+        }
+
+        .document-description {
+            color: #94a3b8;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            flex-grow: 1;
+            line-height: 1.4;
+        }
+
+        .document-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 0.8em;
+            color: #64748b;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .document-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn-download {
+            background: rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .btn-download:hover {
+            background: rgba(167, 139, 250, 0.3);
+            border-color: #a78bfa;
+        }
+
+        .btn-view {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-view:hover {
+            background: rgba(56, 189, 248, 0.3);
+            border-color: #38bdf8;
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px;
+            flex: initial;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #ef4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            color: #a78bfa;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            color: #c084fc;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            color: #e5e7eb;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0 0 10px 0;
+            color: #a78bfa;
+        }
+
+        .close {
+            color: #94a3b8;
+            float: right;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close:hover {
+            color: #cbd5f5;
+        }
+
+        .form-group-modal {
+            margin-bottom: 15px;
+        }
+
+        .form-group-modal label {
+            display: block;
+            color: #cbd5f5;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group-modal input,
+        .form-group-modal textarea,
+        .form-group-modal select {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            color: #e5e7eb;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .form-group-modal input:focus,
+        .form-group-modal textarea:focus,
+        .form-group-modal select:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.2);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .btn-modal-save {
+            background: linear-gradient(90deg, #a78bfa, #c084fc);
+            color: #020617;
+        }
+
+        .btn-modal-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-modal-cancel {
+            background: rgba(100, 116, 139, 0.2);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+
+        .btn-modal-cancel:hover {
+            background: rgba(100, 116, 139, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="/" style="color: inherit; text-decoration: none;">ARKONIX</a>
+            </div>
+
+            <nav class="nav">
+                <a href="/">Главная</a>
+                <a href="/services">Услуги</a>
+                <a href="/team">Команда</a>
+                <a href="/discussions">Обсуждения</a>
+            </nav>
+
+            <div class="user-panel">
+                <a href="/profile">Админ панель</a>
+                <a href="/logout">Выход</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="archive-container">
+        <a href="/profile" class="back-btn">← Вернуться в админ панель</a>
+
+        <div class="archive-header">
+            <h1>Архив документов компании</h1>
+            <p>Управление и хранение важных документов ARKONIX</p>
+            <div class="archive-stats">
+                <div class="stat-item">
+                    <h4>{{ stats.total_docs if stats.total_docs else 0 }}</h4>
+                    <p>Документов</p>
+                </div>
+                <div class="stat-item">
+                    <h4>{{ (stats.total_size / (1024*1024))|round(2) if stats.total_size else 0 }} MB</h4>
+                    <p>Общий размер</p>
+                </div>
+                <div class="stat-item">
+                    <h4>{{ categories|length }}</h4>
+                    <p>Категорий</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h2>Загрузить новый документ</h2>
+
+            <form method="POST" action="/admin/archive/upload" enctype="multipart/form-data" class="upload-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="title">Название документа *</label>
+                        <input type="text" id="title" name="title" required placeholder="Введите название">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Категория *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Выберите категорию</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Описание</label>
+                    <textarea id="description" name="description"
+                        placeholder="Дополнительная информация о документе"></textarea>
+                </div>
+
+                <div class="form-group file-input-wrapper">
+                    <input type="file" id="file" name="file" class="file-input" required>
+                    <label for="file" class="file-label" id="fileLabel">
+                        📎 Выберите или перетащите файл сюда
+                    </label>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Загрузить документ</button>
+            </form>
+        </div>
+
+        <div class="filter-section">
+            <span style="color: #cbd5f5; font-weight: 600;">Фильтр по категориям:</span>
+            <a href="/admin/archive" class="filter-btn {% if not selected_category %}active{% endif %}">Все
+                документы</a>
+            {% for cat in categories %}
+            <a href="/admin/archive?category={{ cat|urlencode }}"
+                class="filter-btn {% if selected_category == cat %}active{% endif %}">
+                {{ cat }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="documents-section">
+            <h2>Все документы</h2>
+
+            {% if documents %}
+            <div class="documents-grid">
+                {% for doc in documents %}
+                <div class="document-card">
+                    <div class="document-icon">
+                        {% if doc['file_type'] in ['pdf', 'doc', 'docx'] %}
+                        📄
+                        {% elif doc['file_type'] in ['jpg', 'jpeg', 'png', 'gif'] %}
+                        🖼️
+                        {% elif doc['file_type'] in ['xls', 'xlsx', 'csv'] %}
+                        📊
+                        {% elif doc['file_type'] in ['zip', 'rar', '7z'] %}
+                        📦
+                        {% else %}
+                        📎
+                        {% endif %}
+                    </div>
+
+                    <div class="document-title">{{ doc['title'] }}</div>
+                    <div class="document-category">{{ doc['category'] }}</div>
+
+                    {% if doc['description'] %}
+                    <div class="document-description">{{ doc['description'] }}</div>
+                    {% endif %}
+
+                    <div class="document-meta">
+                        <span>Автор: {{ doc['uploader_name'] }}</span>
+                        <span>Дата: {{ doc['created_at'][:10] }}</span>
+                        <span>Размер: {{ (doc['file_size'] / 1024)|round(2) }} KB</span>
+                    </div>
+
+                    <div class="document-actions">
+                        <a href="/admin/archive/view/{{ doc['id'] }}" class="btn-small btn-view">
+                            👁️ Просмотр
+                        </a>
+                        <a href="/admin/archive/download/{{ doc['id'] }}" class="btn-small btn-download">
+                            ⬇️ Скачать
+                        </a>
+                        <form method="POST" action="/admin/archive/delete/{{ doc['id'] }}" style="flex: initial;">
+                            <button type="submit" class="btn-small btn-delete"
+                                onclick="return confirm('Вы уверены? Это действие необратимо!')">
+                                🗑️
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3>Документы не найдены</h3>
+                <p>Загрузите первый документ в архив компании</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>Телефон: +38 095 713 66 14</p>
+                <p>Email: <a href="mailto:arkonix.official@gmail.com">arkonix.official@gmail.com</a></p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Соцсети</h4>
+                <a href="https://t.me/worldit23">Telegram</a><br>
+                <a href="https://discord.gg/uKzRMmshnp">Discord</a>
+            </div>
+
+            <div class="footer-section">
+                <a href="/terms">Условия использования</a>
+                <a href="/privacy">Политика и правила</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
+        </div>
+    </footer>
+
+    <script>
+        // Обработка выбора файла
+        const fileInput = document.getElementById('file');
+        const fileLabel = document.getElementById('fileLabel');
+        const fileName = document.getElementById('fileName');
+
+        fileInput.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                fileName.textContent = 'Файл: ' + this.files[0].name;
+                fileLabel.style.background = 'rgba(167, 139, 250, 0.3)';
+            } else {
+                fileName.textContent = '';
+                fileLabel.style.background = 'rgba(167, 139, 250, 0.1)';
+            }
+        });
+
+        // Drag and drop
+        fileLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileLabel.style.background = 'rgba(167, 139, 250, 0.4)';
+        });
+
+        fileLabel.addEventListener('dragleave', () => {
+            fileLabel.style.background = fileInput.files.length > 0 ?
+                'rgba(167, 139, 250, 0.3)' : 'rgba(167, 139, 250, 0.1)';
+        });
+
+        fileLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileInput.files = e.dataTransfer.files;
+            fileInput.dispatchEvent(new Event('change'));
+        });
+
+        // Защита от прямого доступа к файлам
+        document.addEventListener('contextmenu', function (event) {
+            const target = event.target;
+            if (target.classList.contains('btn-download') || target.classList.contains('btn-view')) {
+                // Разрешаем правую кнопку на кнопках скачивания/просмотра
+                return true;
+            }
+            // Для остального контента на странице архива - запрещаем
+            if (document.querySelector('.archive-container')) {
+                // Комментируем, если хотим разрешить правую кнопку везде
+                // event.preventDefault();
+            }
+        });
+
+        // Защита от копирования контента
+        document.addEventListener('copy', function (event) {
+            if (document.querySelector('.archive-container')) {
+                // Разрешаем копирование, но можно добавить водяной знак
+                // event.preventDefault();
+            }
+        });
+
+        // Защита от вывода в консоль
+        console.log('%c⚠️ ВАЖНО', 'color: red; font-size: 20px; font-weight: bold;');
+        console.log('%cЭта сфера зарезервирована для ARKONIX.', 'color: orange; font-size: 14px;');
+        console.log('%cУнесанное разглашение информации карается.', 'color: red; font-size: 12px;');
+
+        // Отключение некоторых горячих клавиш
+        document.addEventListener('keydown', function (event) {
+            // F12 - DevTools
+            if (event.key === 'F12') {
+                event.preventDefault();
+            }
+            // Ctrl+Shift+I - DevTools
+            if (event.ctrlKey && event.shiftKey && event.key === 'I') {
+                event.preventDefault();
+            }
+            // Ctrl+Shift+C - Inspect Element
+            if (event.ctrlKey && event.shiftKey && event.key === 'C') {
+                event.preventDefault();
+            }
+            // Ctrl+Shift+K - Console
+            if (event.ctrlKey && event.shiftKey && event.key === 'K') {
+                event.preventDefault();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

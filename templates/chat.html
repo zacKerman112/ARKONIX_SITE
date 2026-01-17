@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
-
+{% extends "base.html" %}
+{% block title %}Чат - ARKONIX{% endblock %}
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -260,6 +262,77 @@
             border-radius: 16px 16px 16px 4px;
         }
 
+        /* === СТИЛИ ДЛЯ ФАЙЛОВ === */
+        .message-attachment {
+            margin-top: 10px;
+            max-width: 100%;
+        }
+
+        .attachment-image {
+            max-width: 400px;
+            max-height: 300px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .attachment-image:hover {
+            transform: scale(1.02);
+        }
+
+        .attachment-video {
+            max-width: 500px;
+            border-radius: 12px;
+        }
+
+        .attachment-file {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 10px;
+            max-width: 400px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .attachment-file:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.5);
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            color: #e5e7eb;
+            font-weight: 600;
+            font-size: 0.95em;
+            margin-bottom: 4px;
+            word-wrap: break-word;
+        }
+
+        .file-size {
+            color: #94a3b8;
+            font-size: 0.85em;
+        }
+
         .chat-input-area {
             padding: 20px 32px;
             background: rgba(15, 23, 42, 0.95);
@@ -271,6 +344,29 @@
             display: flex;
             gap: 12px;
             align-items: center;
+        }
+
+        .attach-btn {
+            padding: 14px;
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .attach-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            transform: scale(1.05);
+        }
+
+        .attach-btn.active {
+            background: rgba(56, 189, 248, 0.3);
         }
 
         .chat-input {
@@ -312,6 +408,135 @@
         .send-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        /* Форма загрузки файлов */
+        .file-upload-container {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(56, 189, 248, 0.05);
+            border: 2px dashed rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .file-upload-container.active {
+            display: block;
+        }
+
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-preview-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .file-preview-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-preview-name {
+            color: #e5e7eb;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-preview-size {
+            color: #94a3b8;
+            font-size: 0.8em;
+        }
+
+        .file-remove-btn {
+            padding: 6px 12px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .file-remove-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .file-message-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-family: inherit;
+            margin-bottom: 8px;
+        }
+
+        .file-message-input:focus {
+            outline: none;
+            border-color: #38bdf8;
+        }
+
+        .file-upload-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .file-upload-btn,
+        .file-cancel-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .file-upload-btn {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: #020617;
+        }
+
+        .file-upload-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+        }
+
+        .file-upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .file-cancel-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e5e7eb;
+        }
+
+        .file-cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .info-header {
@@ -619,7 +844,38 @@
                             <span class="message-time"
                                 data-timestamp="{{ msg['created_at'] if msg['created_at'] else '' }}">только что</span>
                         </div>
+
+                        {% if msg['text'] %}
                         <div class="message-bubble">{{ msg['text'] }}</div>
+                        {% endif %}
+
+                        {% if msg['attachment_filename'] %}
+                        <div class="message-attachment">
+                            {% if msg['attachment_type'] == 'image' %}
+                            <img src="/chat/attachment/view/{{ msg['attachment_filename'] }}" class="attachment-image"
+                                alt="Изображение"
+                                onclick="window.open('/chat/attachment/view/{{ msg['attachment_filename'] }}', '_blank')">
+
+                            {% elif msg['attachment_type'] == 'video' %}
+                            <video controls class="attachment-video">
+                                <source src="/chat/attachment/view/{{ msg['attachment_filename'] }}">
+                                Ваш браузер не поддерживает видео.
+                            </video>
+
+                            {% else %}
+                            <div class="attachment-file"
+                                onclick="window.open('/chat/attachment/{{ msg['attachment_filename'] }}', '_blank')">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">{{ msg['attachment_filename'].split('_')[3:] | join('_') if
+                                        '_' in msg['attachment_filename'] else msg['attachment_filename'] }}</div>
+                                    <div class="file-size">{{ msg['formatted_size'] if msg.get('formatted_size') else
+                                        'Файл' }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -634,10 +890,26 @@
 
             <div class="chat-input-area">
                 <form class="chat-input-form" id="messageForm">
+                    <button type="button" class="attach-btn" id="attachBtn" title="Прикрепить файл">📎</button>
                     <input type="text" class="chat-input" id="messageInput" placeholder="Напишите сообщение..."
-                        autocomplete="off" required maxlength="2000">
+                        autocomplete="off" maxlength="2000">
                     <button type="submit" class="send-btn" id="sendBtn">Отправить →</button>
                 </form>
+
+                <!-- Скрытый input для выбора файлов -->
+                <input type="file" id="fileInput" style="display: none;"
+                    accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
+
+                <!-- Контейнер для предпросмотра файла -->
+                <div class="file-upload-container" id="fileUploadContainer">
+                    <div class="file-preview" id="filePreview"></div>
+                    <input type="text" class="file-message-input" id="fileMessageInput"
+                        placeholder="Добавьте сообщение к файлу (необязательно)" maxlength="500">
+                    <div class="file-upload-actions">
+                        <button type="button" class="file-cancel-btn" id="fileCancelBtn">Отмена</button>
+                        <button type="button" class="file-upload-btn" id="fileUploadBtn">Отправить файл</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -744,6 +1016,17 @@
         const messageInput = document.getElementById("messageInput");
         const sendBtn = document.getElementById("sendBtn");
 
+        // Файлы
+        const attachBtn = document.getElementById('attachBtn');
+        const fileInput = document.getElementById('fileInput');
+        const fileUploadContainer = document.getElementById('fileUploadContainer');
+        const filePreview = document.getElementById('filePreview');
+        const fileMessageInput = document.getElementById('fileMessageInput');
+        const fileUploadBtn = document.getElementById('fileUploadBtn');
+        const fileCancelBtn = document.getElementById('fileCancelBtn');
+
+        let selectedFile = null;
+
         // Set для отслеживания уже добавленных сообщений
         const addedMessages = new Set();
 
@@ -803,7 +1086,112 @@
             return div.innerHTML;
         }
 
-        // Отправка сообщения
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const imageExt = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'];
+            const videoExt = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'];
+
+            if (imageExt.includes(ext)) return 'image';
+            if (videoExt.includes(ext)) return 'video';
+            return 'file';
+        }
+
+        function getFileIcon(fileType) {
+            switch (fileType) {
+                case 'image': return '🖼️';
+                case 'video': return '🎥';
+                default: return '📄';
+            }
+        }
+
+        // === РАБОТА С ФАЙЛАМИ ===
+
+        attachBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.size > 50 * 1024 * 1024) {
+                alert('Файл слишком большой! Максимальный размер: 50 МБ');
+                fileInput.value = '';
+                return;
+            }
+
+            selectedFile = file;
+            showFilePreview(file);
+            fileUploadContainer.classList.add('active');
+            attachBtn.classList.add('active');
+        });
+
+        function showFilePreview(file) {
+            const fileType = getFileType(file.name);
+            const fileSize = formatFileSize(file.size);
+            const icon = getFileIcon(fileType);
+
+            filePreview.innerHTML = `
+                <div class="file-preview-icon">${icon}</div>
+                <div class="file-preview-info">
+                    <div class="file-preview-name">${escapeHtml(file.name)}</div>
+                    <div class="file-preview-size">${fileSize}</div>
+                </div>
+                <button type="button" class="file-remove-btn" onclick="cancelFileUpload()">✕</button>
+            `;
+        }
+
+        function cancelFileUpload() {
+            selectedFile = null;
+            fileInput.value = '';
+            fileUploadContainer.classList.remove('active');
+            attachBtn.classList.remove('active');
+            fileMessageInput.value = '';
+        }
+
+        fileCancelBtn.addEventListener('click', cancelFileUpload);
+
+        fileUploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const messageText = fileMessageInput.value.trim();
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('text', messageText);
+
+            fileUploadBtn.disabled = true;
+            fileCancelBtn.disabled = true;
+            fileUploadBtn.textContent = 'Загрузка...';
+
+            try {
+                const response = await fetch(`/chat/${chatId}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    cancelFileUpload();
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка загрузки: ' + (error.error || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Ошибка при загрузке файла');
+            } finally {
+                fileUploadBtn.disabled = false;
+                fileCancelBtn.disabled = false;
+                fileUploadBtn.textContent = 'Отправить файл';
+            }
+        });
+
+        // Отправка текстового сообщения
         if (messageForm) {
             messageForm.addEventListener("submit", (e) => {
                 e.preventDefault();
@@ -817,7 +1205,6 @@
                     });
                     messageInput.value = "";
 
-                    // Включаем кнопку обратно через небольшую задержку
                     setTimeout(() => {
                         sendBtn.disabled = false;
                     }, 500);
@@ -827,17 +1214,14 @@
 
         // Получение нового сообщения
         socket.on("new_message", (data) => {
-            // Создаём уникальный идентификатор сообщения
             const messageId = data.id
                 ? `msg-${data.id}`
                 : `${data.sender_id}-${data.created_at || Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-            // Проверяем, не добавлено ли уже это сообщение
             if (addedMessages.has(messageId)) {
                 return;
             }
 
-            // Добавляем в Set
             addedMessages.add(messageId);
 
             const isMyMessage = data.sender_id === userId;
@@ -852,6 +1236,49 @@
             const displayName = isMyMessage ? 'Вы' : (senderName || 'Администратор');
             const timestamp = data.created_at || new Date().toISOString();
 
+            let attachmentHtml = '';
+
+            if (data.attachment_type && data.attachment_filename) {
+                const filename = data.attachment_filename;
+                const fileType = data.attachment_type;
+                const fileSize = data.formatted_size || formatFileSize(data.attachment_size || 0);
+
+                if (fileType === 'image') {
+                    attachmentHtml = `
+                        <div class="message-attachment">
+                            <img src="/chat/attachment/view/${filename}" 
+                                 class="attachment-image" 
+                                 alt="Изображение"
+                                 onclick="window.open('/chat/attachment/view/${filename}', '_blank')">
+                        </div>
+                    `;
+                } else if (fileType === 'video') {
+                    attachmentHtml = `
+                        <div class="message-attachment">
+                            <video controls class="attachment-video">
+                                <source src="/chat/attachment/view/${filename}">
+                                Ваш браузер не поддерживает видео.
+                            </video>
+                        </div>
+                    `;
+                } else {
+                    const originalName = filename.split('_').slice(3).join('_') || filename;
+                    attachmentHtml = `
+                        <div class="message-attachment">
+                            <div class="attachment-file" onclick="window.open('/chat/attachment/${filename}', '_blank')">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">${escapeHtml(originalName)}</div>
+                                    <div class="file-size">${fileSize}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            const messageText = data.text ? `<div class="message-bubble">${escapeHtml(data.text)}</div>` : '';
+
             messageDiv.innerHTML = `
                 <div class="message-avatar">${escapeHtml(avatarLetter)}</div>
                 <div class="message-content-wrapper">
@@ -859,7 +1286,8 @@
                         <span class="message-sender">${escapeHtml(displayName)}</span>
                         <span class="message-time" data-timestamp="${timestamp}">только что</span>
                     </div>
-                    <div class="message-bubble">${escapeHtml(data.text)}</div>
+                    ${messageText}
+                    ${attachmentHtml}
                 </div>
             `;
 
@@ -890,7 +1318,6 @@
 
         socket.on('connect', () => {
             console.log('Socket connected');
-            // Переподключаемся к комнате
             if (chatId > 0) {
                 socket.emit("join", { chat_id: chatId });
             }
@@ -906,13 +1333,11 @@
                     `;
                 }
 
-                // Скрываем форму установки цены для админа
                 const adminPriceSetter = document.getElementById('adminPriceSetter');
                 if (adminPriceSetter) {
                     adminPriceSetter.classList.add('hidden');
                 }
 
-                // Обновляем кнопки действий для клиента
                 const clientActions = document.getElementById('clientActions');
                 if (clientActions && !isAdmin) {
                     clientActions.innerHTML = `
@@ -953,7 +1378,6 @@
                     const price = parseFloat(priceInputField.value);
                     const submitBtn = e.target.querySelector('.set-price-btn');
 
-                    // Валидация
                     if (isNaN(price) || price < 0 || price > 999999) {
                         alert('Пожалуйста, введите корректную цену (от 0 до 999999)');
                         return;

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
-
+{% extends "base.html" %}
+{% block title %}Архив компании - ARKONIX{% endblock %}
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <title>Админ панель - ARKONIX</title>
@@ -66,6 +68,19 @@
             color: #cbd5f5;
         }
 
+        .stat-card.staff-earnings {
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .stat-card.staff-earnings:hover {
+            border-color: #22c55e;
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.2);
+        }
+
+        .stat-card.staff-earnings h3 {
+            color: #22c55e;
+        }
+
         .admin-actions {
             display: flex;
             gap: 15px;
@@ -92,7 +107,6 @@
             box-shadow: 0 6px 24px rgba(56, 189, 248, 0.5);
         }
 
-        /* Специальная кнопка для документов сотрудников */
         .action-btn-docs {
             background: linear-gradient(90deg, #818cf8, #a78bfa);
         }
@@ -101,13 +115,20 @@
             box-shadow: 0 6px 24px rgba(129, 140, 248, 0.5);
         }
 
-        /* Специальная кнопка для настроек оплаты */
         .action-btn-payment {
             background: linear-gradient(90deg, #22c55e, #16a34a);
         }
 
         .action-btn-payment:hover {
             box-shadow: 0 6px 24px rgba(34, 197, 94, 0.5);
+        }
+
+        .action-btn-staff-payments {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .action-btn-staff-payments:hover {
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
         }
 
         .chats-section {
@@ -132,7 +153,6 @@
             padding: 20px;
             margin-bottom: 20px;
             transition: all 0.3s;
-            cursor: pointer;
             background: rgba(2, 6, 23, 0.4);
             position: relative;
         }
@@ -143,7 +163,7 @@
             transform: translateY(-4px);
         }
 
-        /* Подсветка для чатов в ожидании */
+        /* Разные цвета для разных статусов */
         .chat-item.waiting {
             border-color: rgba(251, 191, 36, 0.3);
             background: rgba(251, 191, 36, 0.05);
@@ -152,6 +172,17 @@
         .chat-item.waiting:hover {
             border-color: #fbbf24;
             box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
+        }
+
+        .chat-item.in_progress {
+            border-color: rgba(56, 189, 248, 0.3);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .chat-item.completed {
+            border-color: rgba(34, 197, 94, 0.3);
+            background: rgba(34, 197, 94, 0.05);
+            opacity: 0.8;
         }
 
         .chat-header {
@@ -227,14 +258,25 @@
             text-decoration: underline;
         }
 
+        /* НОВЫЕ СТИЛИ ДЛЯ СТАТУСОВ */
+        .status-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
         .status-badge {
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: 20px;
             font-size: 0.85em;
             font-weight: 600;
-            animation: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
+        /* Статус чата */
         .status-waiting {
             background: rgba(251, 191, 36, 0.2);
             color: #fbbf24;
@@ -260,7 +302,32 @@
             border: 1px solid rgba(56, 189, 248, 0.3);
         }
 
-        .status-finished {
+        .status-completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Статус оплаты */
+        .payment-pending {
+            background: rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .payment-awaiting {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .payment-paid {
             background: rgba(34, 197, 94, 0.2);
             color: #22c55e;
             border: 1px solid rgba(34, 197, 94, 0.3);
@@ -281,6 +348,7 @@
             display: flex;
             gap: 10px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -292,6 +360,7 @@
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
+            font-size: 0.9em;
         }
 
         .btn-primary {
@@ -302,6 +371,32 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         .empty-state {
@@ -321,7 +416,6 @@
             margin-top: 20px;
         }
 
-        /* Индикатор нового чата */
         .new-indicator {
             position: absolute;
             top: 10px;
@@ -344,6 +438,20 @@
             50% {
                 opacity: 0.3;
             }
+        }
+
+        /* Стиль для завершенных чатов */
+        .completed-label {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -390,8 +498,12 @@
                 <p>В процессе</p>
             </div>
             <div class="stat-card">
-                <h3>{{ chats|selectattr('status', 'equalto', 'finished')|list|length }}</h3>
+                <h3>{{ chats|selectattr('status', 'equalto', 'completed')|list|length }}</h3>
                 <p>Завершено</p>
+            </div>
+            <div class="stat-card staff-earnings">
+                <h3>{{ staff_total_earned if staff_total_earned else 0 }}</h3>
+                <p>Выплачено сотрудникам ($)</p>
             </div>
         </div>
 
@@ -400,7 +512,10 @@
                 💳 Настройки оплаты
             </a>
             <a href="/admin/payments" class="action-btn" style="background: linear-gradient(90deg, #fbbf24, #f59e0b);">
-                💰 История платежей
+                💰 Платежи клиентов ({{ payment_stats['total_payments'] if payment_stats else 0 }})
+            </a>
+            <a href="/admin/payments/staff" class="action-btn action-btn-staff-payments">
+                💵 Зачисления сотрудникам
             </a>
             <a href="/admin/reviews" class="action-btn">
                 📝 Управление отзывами
@@ -412,6 +527,9 @@
                 style="background: linear-gradient(90deg, #a78bfa, #c084fc);">
                 📁 Все документы
             </a>
+            <a href="/admin/archive" class="action-btn" style="background: linear-gradient(90deg, #ec4899, #f43f5e);">
+                Архив компании
+            </a>
         </div>
 
         <div class="chats-section">
@@ -419,9 +537,15 @@
 
             {% if chats %}
             {% for chat in chats %}
-            <div class="chat-item {% if chat['status'] == 'waiting' %}waiting{% endif %}">
+            <div class="chat-item {{ chat['status'] }}">
                 {% if chat['status'] == 'waiting' %}
                 <div class="new-indicator"></div>
+                {% endif %}
+
+                {% if chat['status'] == 'completed' %}
+                <div class="completed-label">
+                    ✅ Чат завершён
+                </div>
                 {% endif %}
 
                 <div class="chat-header">
@@ -433,15 +557,37 @@
                             <span>📅 {{ chat['created_at'][:16] }}</span>
                         </div>
                     </div>
-                    <span class="status-badge status-{{ chat['status'] }}">
-                        {% if chat['status'] == 'waiting' %}
-                        ⏳ Ожидает ответа
-                        {% elif chat['status'] == 'in_progress' %}
-                        🔄 В процессе
+
+                    <!-- СТАТУСЫ -->
+                    <div class="status-badges">
+                        <!-- Статус чата -->
+                        <span class="status-badge status-{{ chat['status'] }}">
+                            {% if chat['status'] == 'waiting' %}
+                            ⏳ Ожидает
+                            {% elif chat['status'] == 'in_progress' %}
+                            🔄 В процессе
+                            {% elif chat['status'] == 'completed' %}
+                            ✅ Завершено
+                            {% else %}
+                            ❌ Отменено
+                            {% endif %}
+                        </span>
+
+                        <!-- Статус оплаты -->
+                        {% if chat['payment_status'] == 'paid' %}
+                        <span class="status-badge payment-paid">
+                            💰 Оплачено
+                        </span>
+                        {% elif chat['payment_status'] == 'awaiting_confirmation' %}
+                        <span class="status-badge payment-awaiting">
+                            ⏰ Ожидает подтверждения
+                        </span>
                         {% else %}
-                        ✅ Завершено
+                        <span class="status-badge payment-pending">
+                            💳 Не оплачено
+                        </span>
                         {% endif %}
-                    </span>
+                    </div>
                 </div>
 
                 <div class="client-info">
@@ -468,14 +614,6 @@
                             </span>
                         </div>
                         {% endif %}
-                        {% if chat['payment_status'] == 'paid' %}
-                        <div class="client-info-item">
-                            <span
-                                style="background: rgba(34, 197, 94, 0.2); color: #22c55e; padding: 4px 10px; border-radius: 8px; font-weight: 600; font-size: 0.85em;">
-                                ✓ Оплачено
-                            </span>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
 
@@ -489,11 +627,22 @@
                 <div class="chat-actions">
                     <a href="/chat/{{ chat['id'] }}" class="btn btn-primary">
                         {% if chat['status'] == 'waiting' %}
-                        Ответить →
+                        ✉️ Ответить
+                        {% elif chat['status'] == 'completed' %}
+                        👁️ Просмотреть
                         {% else %}
-                        Открыть чат →
+                        💬 Открыть чат
                         {% endif %}
                     </a>
+
+                    {% if chat['status'] != 'completed' %}
+                    <form method="POST" action="/admin/chat/complete/{{ chat['id'] }}" style="display: inline;">
+                        <button type="submit" class="btn btn-success"
+                            onclick="return confirm('Вы уверены, что хотите завершить этот чат?')">
+                            ✅ Завершить чат
+                        </button>
+                    </form>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -536,6 +685,13 @@
             &copy; 2025 ARKONIX. Все права защищены.
         </div>
     </footer>
+
+    <script>
+        // Автообновление статистики каждые 30 секунд
+        setInterval(() => {
+            location.reload();
+        }, 30000);
+    </script>
 
 </body>
 

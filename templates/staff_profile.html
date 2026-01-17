@@ -1,128 +1,64 @@
 <!DOCTYPE html>
 <html lang="ru">
-
+{% extends "base.html" %}
+{% block title %}Профиль сотрудника - ARKONIX{% endblock %}
+{% block content %}
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет сотрудника - ARKONIX</title>
+    <title>Профиль сотрудника - ARKONIX</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        /* Бургер-меню */
-        .burger-menu {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            z-index: 1001;
-            padding: 10px;
-        }
-
-        .burger-line {
-            width: 28px;
-            height: 3px;
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
-
-        .burger-menu:hover .burger-line {
-            background: linear-gradient(90deg, #818cf8, #38bdf8);
-        }
-
-        .burger-menu.active .burger-line:nth-child(1) {
-            transform: translateY(8px) rotate(45deg);
-        }
-
-        .burger-menu.active .burger-line:nth-child(2) {
-            opacity: 0;
-        }
-
-        .burger-menu.active .burger-line:nth-child(3) {
-            transform: translateY(-8px) rotate(-45deg);
-        }
-
-        .menu-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            z-index: 999;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .menu-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-
-        .staff-container {
+        .staff-profile-container {
             max-width: 1200px;
             margin: 100px auto 50px;
             padding: 20px;
         }
 
-        .staff-header {
-            background: linear-gradient(135deg, #38bdf8, #818cf8);
+        .profile-header {
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
             color: #020617;
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 40px rgba(56, 189, 248, 0.3);
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.2);
         }
 
-        .staff-header h1 {
+        .profile-header h1 {
             margin: 0 0 10px 0;
             font-size: 2.5em;
             font-weight: 900;
         }
 
-        .staff-header p {
+        .profile-header p {
             margin: 0;
             opacity: 0.9;
-            font-size: 1.1em;
         }
 
-        .profile-grid {
+        .info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .profile-card {
+        .info-card {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 30px;
+            padding: 25px;
+            border-radius: 16px;
             backdrop-filter: blur(12px);
-            transition: all 0.3s;
         }
 
-        .profile-card:hover {
-            transform: translateY(-5px);
-            border-color: #38bdf8;
-            box-shadow: 0 10px 40px rgba(56, 189, 248, 0.2);
-        }
-
-        .profile-card h2 {
-            margin: 0 0 25px 0;
-            font-size: 1.8em;
+        .info-card h3 {
+            margin: 0 0 15px 0;
             color: #38bdf8;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-size: 1.3em;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 15px 0;
+            padding: 10px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
@@ -132,361 +68,341 @@
 
         .info-label {
             color: #94a3b8;
-            font-weight: 600;
-            font-size: 0.95em;
         }
 
         .info-value {
             color: #e5e7eb;
-            font-weight: 700;
-            text-align: right;
+            font-weight: 600;
         }
 
-        .status-badge {
-            padding: 6px 14px;
+        .earnings-section {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05));
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            padding: 30px;
             border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 700;
-            display: inline-block;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(34, 197, 94, 0.1);
         }
 
-        .status-pending {
-            background: rgba(251, 191, 36, 0.2);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.3);
+        .earnings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .status-approved {
-            background: rgba(34, 197, 94, 0.2);
+        .earnings-header h2 {
+            margin: 0;
             color: #22c55e;
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            font-size: 1.8em;
         }
 
-        .status-rejected {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        .total-earned {
+            font-size: 3em;
+            font-weight: 900;
+            color: #22c55e;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .earnings-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(2, 6, 23, 0.4);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .stat-item h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.8em;
+            color: #22c55e;
+        }
+
+        .stat-item p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .view-all-payments-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .view-all-payments-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .recent-payments {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .recent-payments h3 {
+            margin: 0 0 20px 0;
+            color: #38bdf8;
+            font-size: 1.5em;
+        }
+
+        .payment-item {
+            background: rgba(2, 6, 23, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        .payment-item:hover {
+            border-color: #22c55e;
+            transform: translateX(5px);
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .payment-amount {
+            font-size: 1.5em;
+            font-weight: 900;
+            color: #22c55e;
+        }
+
+        .payment-date {
+            color: #94a3b8;
+            font-size: 0.85em;
+        }
+
+        .payment-description {
+            color: #cbd5f5;
+            font-size: 0.9em;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .documents-section {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(12px);
-            margin-bottom: 40px;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
         }
 
-        .documents-section h2 {
-            margin: 0 0 25px 0;
-            font-size: 1.8em;
+        .documents-section h3 {
+            margin: 0 0 20px 0;
             color: #38bdf8;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-size: 1.5em;
         }
 
         .document-item {
-            background: rgba(2, 6, 23, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
+            background: rgba(2, 6, 23, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
+            transition: 0.3s;
         }
 
         .document-item:hover {
             border-color: #38bdf8;
-            transform: translateX(5px);
-            box-shadow: 0 5px 20px rgba(56, 189, 248, 0.15);
         }
 
-        .document-info {
-            flex: 1;
+        .document-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
         .document-name {
             color: #e5e7eb;
             font-weight: 700;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        .document-meta {
-            color: #94a3b8;
-            font-size: 0.9em;
+        .document-type {
+            padding: 4px 10px;
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 8px;
+            font-size: 0.8em;
+            color: #38bdf8;
         }
 
         .document-actions {
             display: flex;
             gap: 10px;
+            margin-top: 10px;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 700;
+            font-weight: 600;
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
-        .btn-primary {
+        .btn-view {
             background: linear-gradient(90deg, #38bdf8, #818cf8);
             color: #020617;
         }
 
-        .btn-primary:hover {
+        .btn-view:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 3px 15px rgba(56, 189, 248, 0.4);
         }
 
-        .btn-secondary {
-            background: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.3);
+        .btn-download {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: white;
         }
 
-        .btn-secondary:hover {
-            background: rgba(56, 189, 248, 0.25);
-            border-color: #38bdf8;
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 15px rgba(34, 197, 94, 0.4);
         }
 
         .upload-section {
             background: rgba(15, 23, 42, 0.6);
-            border: 2px dashed rgba(56, 189, 248, 0.3);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 40px;
-            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
         }
 
-        .upload-section:hover {
-            border-color: #38bdf8;
-            background: rgba(15, 23, 42, 0.8);
-        }
-
-        .upload-section h2 {
+        .upload-section h3 {
             margin: 0 0 20px 0;
-            font-size: 1.8em;
-            color: #38bdf8;
-            font-weight: 800;
+            color: #818cf8;
+            font-size: 1.5em;
         }
 
         .upload-form {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
+            display: grid;
+            gap: 15px;
         }
 
         .form-group label {
             display: block;
             color: #cbd5f5;
-            font-weight: 600;
             margin-bottom: 8px;
-            font-size: 1em;
+            font-weight: 600;
         }
 
-        .form-group input[type="text"],
-        .form-group textarea,
-        .form-group select {
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            padding: 14px;
-            background: rgba(15, 23, 42, 0.8);
+            padding: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
+            background: rgba(2, 6, 23, 0.6);
             color: #e5e7eb;
             font-size: 1em;
-            transition: all 0.3s;
         }
 
-        .form-group input[type="text"]:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+            border-color: #818cf8;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-input-label {
-            display: block;
-            padding: 14px;
-            background: rgba(56, 189, 248, 0.15);
-            border: 2px dashed rgba(56, 189, 248, 0.3);
+        .btn-upload {
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            color: white;
+            border: none;
             border-radius: 10px;
-            color: #38bdf8;
-            text-align: center;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            font-weight: 600;
         }
 
-        .file-input-label:hover {
-            background: rgba(56, 189, 248, 0.25);
-            border-color: #38bdf8;
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(129, 140, 248, 0.4);
         }
 
-        .file-name {
-            margin-top: 10px;
-            color: #94a3b8;
-            font-size: 0.9em;
-            font-style: italic;
-        }
-
-        .flash-message {
-            padding: 15px 20px;
+        .logout-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            color: white;
+            text-decoration: none;
             border-radius: 10px;
-            margin-bottom: 20px;
+            font-weight: 700;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Стили для уведомления об одобрении */
+        .approval-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+            z-index: 9999;
+            animation: slideInRight 0.5s ease-out, slideOutRight 0.5s ease-out 2s forwards;
             font-weight: 600;
+            font-size: 1.1em;
         }
 
-        .flash-success {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        .flash-error {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #64748b;
-        }
-
-        .empty-state svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
-            opacity: 0.3;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 968px) {
-            .burger-menu {
-                display: flex !important;
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
             }
 
-            .nav {
-                position: fixed !important;
-                top: 0 !important;
-                right: -100% !important;
-                width: 320px !important;
-                max-width: 85vw !important;
-                height: 100vh !important;
-                background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
-                flex-direction: column !important;
-                padding: 90px 25px 30px !important;
-                gap: 0 !important;
-                z-index: 1000 !important;
-                transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
-                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.7) !important;
-                overflow-y: auto !important;
-            }
-
-            .nav.active {
-                right: 0 !important;
-            }
-
-            .nav a {
-                padding: 18px 20px !important;
-                margin: 8px 0 !important;
-                border-radius: 12px !important;
-                background: rgba(56, 189, 248, 0.08) !important;
-                border: 1px solid rgba(56, 189, 248, 0.15) !important;
-                transition: all 0.3s ease !important;
-                font-size: 1.1em !important;
-                text-align: left !important;
-            }
-
-            .user-panel {
-                position: fixed !important;
-                bottom: 0 !important;
-                left: -100% !important;
-                right: auto !important;
-                width: 100% !important;
-                background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
-                padding: 25px 20px 30px !important;
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 12px !important;
-                z-index: 1000 !important;
-                transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
-                border-top: 3px solid rgba(56, 189, 248, 0.3) !important;
-                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.7) !important;
-            }
-
-            .user-panel.active {
-                left: 0 !important;
-            }
-
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-container {
-                justify-content: space-between !important;
-            }
-
-            .logo {
-                z-index: 1001 !important;
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
         }
 
-        @media (max-width: 768px) {
-            .staff-header h1 {
-                font-size: 2em;
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
             }
 
-            .document-item {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-
-            .document-actions {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .document-actions .btn {
-                width: 100%;
+            to {
+                transform: translateX(400px);
+                opacity: 0;
             }
         }
     </style>
@@ -500,195 +416,215 @@
                 <a href="/" style="color: inherit; text-decoration: none;">ARKONIX</a>
             </div>
 
-            <div class="burger-menu" id="burgerMenu">
-                <span class="burger-line"></span>
-                <span class="burger-line"></span>
-                <span class="burger-line"></span>
-            </div>
-
-            <nav class="nav" id="nav">
+            <nav class="nav">
                 <a href="/">Главная</a>
                 <a href="/services">Услуги</a>
                 <a href="/team">Команда</a>
                 <a href="/discussions">Обсуждения</a>
             </nav>
 
-            <div class="user-panel" id="userPanel">
-                <a href="/staff/profile">Мой кабинет</a>
+            <div class="user-panel">
+                <a href="/staff/profile">Профиль</a>
                 <a href="/logout">Выход</a>
             </div>
         </div>
-        <div class="menu-overlay" id="menuOverlay"></div>
     </header>
 
-    <div class="staff-container">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        {% for message in messages %}
-        <div
-            class="flash-message {% if 'успешно' in message.lower() or 'отправлен' in message.lower() %}flash-success{% else %}flash-error{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-
-        <div class="staff-header">
-            <h1>👤 Личный кабинет сотрудника</h1>
-            <p>Добро пожаловать, {{ member.first_name }} {{ member.last_name }}!</p>
+    <div class="staff-profile-container">
+        <div class="profile-header">
+            <h1>👤 Профиль сотрудника</h1>
+            <p>{{ member['first_name'] }} {{ member['last_name'] }} - {{ member['position'] }}</p>
         </div>
 
-        <div class="profile-grid">
-            <div class="profile-card">
-                <h2>📋 Личные данные</h2>
-                <div class="info-row">
-                    <span class="info-label">Имя:</span>
-                    <span class="info-value">{{ member.first_name }}</span>
+        <!-- НОВАЯ СЕКЦИЯ ЗАРАБОТКА -->
+        <div class="earnings-section">
+            <div class="earnings-header">
+                <h2>💰 Мой заработок</h2>
+            </div>
+
+            <div class="total-earned">
+                ${{ "%.2f"|format(total_earned) if total_earned else "0.00" }}
+            </div>
+
+            <div class="earnings-stats">
+                <div class="stat-item">
+                    <h4>{{ payment_count }}</h4>
+                    <p>Всего зачислений</p>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Фамилия:</span>
-                    <span class="info-value">{{ member.last_name }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Должность:</span>
-                    <span class="info-value">{{ member.position }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Email:</span>
-                    <span class="info-value">{{ member.email or 'Не указан' }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Логин:</span>
-                    <span class="info-value">{{ member.username }}</span>
+                <div class="stat-item">
+                    <h4>${{ "%.2f"|format(total_earned / payment_count) if payment_count > 0 else "0.00" }}</h4>
+                    <p>Средняя выплата</p>
                 </div>
             </div>
 
-            <div class="profile-card">
-                <h2>📊 Статус</h2>
-                <div class="info-row">
-                    <span class="info-label">Статус регистрации:</span>
-                    <span class="info-value">
-                        {% if member.status == 'pending' %}
-                        <span class="status-badge status-pending">⏳ Ожидает одобрения</span>
-                        {% elif member.status == 'approved' %}
-                        <span class="status-badge status-approved">✅ Одобрено</span>
-                        {% else %}
-                        <span class="status-badge status-rejected">❌ Отклонено</span>
-                        {% endif %}
-                    </span>
+            <div style="text-align: center;">
+                <a href="/staff/payments" class="view-all-payments-btn">📊 Посмотреть всю историю зачислений</a>
+            </div>
+        </div>
+
+        <!-- ПОСЛЕДНИЕ ЗАЧИСЛЕНИЯ -->
+        {% if recent_payments %}
+        <div class="recent-payments">
+            <h3>📋 Последние 5 зачислений</h3>
+
+            {% for payment in recent_payments %}
+            <div class="payment-item">
+                <div class="payment-header">
+                    <div class="payment-amount">
+                        +${{ "%.2f"|format(payment['amount']) }}
+                    </div>
+                    <div class="payment-date">
+                        📅 {{ payment['created_at'][:16] if payment['created_at'] else 'Недавно' }}
+                    </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Дата регистрации:</span>
-                    <span class="info-value">{{ member.created_at[:16] }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">ID участника:</span>
-                    <span class="info-value">#{{ member.id }}</span>
-                </div>
-                {% if member.status == 'pending' %}
-                <div
-                    style="margin-top: 20px; padding: 15px; background: rgba(251, 191, 36, 0.1); border-radius: 10px; border-left: 3px solid #fbbf24;">
-                    <p style="margin: 0; color: #fbbf24; font-size: 0.95em;">
-                        ⏳ Ваша заявка на рассмотрении у администратора. После одобрения вы получите полный доступ к
-                        функциям команды.
-                    </p>
+                {% if payment['description'] %}
+                <div class="payment-description">
+                    📝 {{ payment['description'] }}
                 </div>
                 {% endif %}
             </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Основная информация -->
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>📋 Основная информация</h3>
+                <div class="info-row">
+                    <span class="info-label">Имя:</span>
+                    <span class="info-value">{{ member['first_name'] }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Фамилия:</span>
+                    <span class="info-value">{{ member['last_name'] }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Должность:</span>
+                    <span class="info-value">{{ member['position'] }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ member['email'] if member['email'] else 'Не указан' }}</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>🔐 Данные входа</h3>
+                <div class="info-row">
+                    <span class="info-label">Логин:</span>
+                    <span class="info-value">{{ member['username'] }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Дата регистрации:</span>
+                    <span class="info-value">{{ member['created_at'][:10] if member['created_at'] else 'Неизвестно'
+                        }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Статус:</span>
+                    <span class="info-value">
+                        {% if member['status'] == 'approved' %}
+                        ✅ Одобрен
+                        {% elif member['status'] == 'pending' %}
+                        ⏳ На рассмотрении
+                        {% else %}
+                        ❌ Отклонен
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
         </div>
 
+        <!-- Мои документы -->
         <div class="documents-section">
-            <h2>📁 Мои документы</h2>
+            <h3>📄 Мои документы ({{ documents|length }})</h3>
 
             {% if documents %}
             {% for doc in documents %}
             <div class="document-item">
-                <div class="document-info">
-                    <div class="document-name">
-                        {% if doc.document_type == 'contract' %}
-                        📄 Договор о участии
+                <div class="document-header">
+                    <span class="document-name">📎 {{ doc['document_name'] }}</span>
+                    <span class="document-type">
+                        {% if doc['document_type'] == 'contract' %}
+                        📋 Договор
+                        {% elif doc['document_type'] == 'passport' %}
+                        🪪 Паспорт
+                        {% elif doc['document_type'] == 'certificate' %}
+                        🎓 Сертификат
+                        {% elif doc['document_type'] == 'other' %}
+                        📁 Другое
                         {% else %}
-                        📎 {{ doc.document_name or 'Документ' }}
+                        📄 {{ doc['document_type'] }}
                         {% endif %}
-                    </div>
-                    <div class="document-meta">
-                        Загружен: {{ doc.uploaded_at[:16] }}
-                        {% if doc.description %}
-                        <br>Описание: {{ doc.description }}
-                        {% endif %}
-                    </div>
+                    </span>
                 </div>
+
+                {% if doc.get('description') %}
+                <div style="color: #94a3b8; font-size: 0.9em; margin-top: 8px;">
+                    {{ doc['description'] }}
+                </div>
+                {% endif %}
+
+                <div style="color: #64748b; font-size: 0.85em; margin-top: 8px;">
+                    📅 Загружено: {{ doc['uploaded_at'][:16] if doc['uploaded_at'] else 'Недавно' }}
+                </div>
+
                 <div class="document-actions">
-                    <a href="/staff/document/view/{{ doc.id }}" class="btn btn-secondary" target="_blank">
-                        👁️ Просмотр
+                    <a href="/staff/document/preview/{{ doc['id'] }}" class="btn btn-view" target="_blank">
+                        👁️ Просмотреть
                     </a>
-                    <a href="/staff/document/download/{{ doc.id }}" class="btn btn-primary">
+                    <a href="/staff/document/download/{{ doc['id'] }}" class="btn btn-download">
                         ⬇️ Скачать
                     </a>
                 </div>
             </div>
             {% endfor %}
             {% else %}
-            <div class="empty-state">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <h3>Документы не загружены</h3>
+            <div style="text-align: center; padding: 40px; color: #64748b;">
                 <p>У вас пока нет загруженных документов</p>
             </div>
             {% endif %}
         </div>
 
+        <!-- Загрузка нового документа -->
         <div class="upload-section">
-            <h2>📤 Загрузить новый документ</h2>
-            <p style="color: #94a3b8; margin-bottom: 30px;">Вы можете загружать дополнительные документы для
-                администратора</p>
-
-            <form method="post" action="/staff/upload_document" enctype="multipart/form-data" class="upload-form">
+            <h3>📤 Загрузить новый документ</h3>
+            <form method="POST" action="/staff/upload_document" enctype="multipart/form-data" class="upload-form">
                 <div class="form-group">
-                    <label>Название документа:</label>
-                    <input type="text" name="document_name" placeholder="Например: Паспорт, Сертификат..." required>
+                    <label for="document_name">Название документа *</label>
+                    <input type="text" id="document_name" name="document_name" placeholder="Например: Сертификат Python"
+                        required>
                 </div>
 
                 <div class="form-group">
-                    <label>Тип документа:</label>
-                    <select name="document_type" required>
+                    <label for="document_type">Тип документа *</label>
+                    <select id="document_type" name="document_type" required>
                         <option value="">Выберите тип</option>
-                        <option value="passport">Паспорт</option>
-                        <option value="certificate">Сертификат</option>
-                        <option value="diploma">Диплом</option>
-                        <option value="other">Другое</option>
+                        <option value="passport">🪪 Паспорт</option>
+                        <option value="certificate">🎓 Сертификат</option>
+                        <option value="diploma">🎓 Диплом</option>
+                        <option value="contract">📋 Договор</option>
+                        <option value="other">📁 Другое</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Описание (необязательно):</label>
-                    <textarea name="description" placeholder="Краткое описание документа..."></textarea>
+                    <label for="description">Описание (опционально)</label>
+                    <textarea id="description" name="description" rows="3"
+                        placeholder="Краткое описание документа"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label>Файл документа:</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" name="document" id="documentFile" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                            required onchange="updateFileName(this)">
-                        <label for="documentFile" class="file-input-label">
-                            📎 Выберите файл (PDF, DOC, DOCX, JPG, PNG)
-                        </label>
-                        <div class="file-name" id="fileName"></div>
-                    </div>
+                    <label for="document">Выберите файл *</label>
+                    <input type="file" id="document" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 1.1em;">
-                    📤 Отправить документ администратору
-                </button>
+                <button type="submit" class="btn-upload">📤 Загрузить документ</button>
             </form>
         </div>
 
-        <div style="text-align: center; margin-top: 40px;">
-            <a href="/logout" class="btn btn-secondary" style="padding: 14px 40px;">
-                🚪 Выйти из аккаунта
-            </a>
+        <div style="text-align: center;">
+            <a href="/logout" class="logout-btn">🚪 Выйти из аккаунта</a>
         </div>
     </div>
 
@@ -697,7 +633,7 @@
             <div class="footer-section">
                 <h4>Контакты</h4>
                 <p>Телефон: +38 095 713 66 14</p>
-                <p>Email: itw23265@gmail.com</p>
+                <p>Email: <a href="mailto:arkonix.official@gmail.com">arkonix.official@gmail.com</a></p>
             </div>
 
             <div class="footer-section">
@@ -718,50 +654,51 @@
     </footer>
 
     <script>
-        // Бургер-меню
-        document.addEventListener('DOMContentLoaded', function () {
-            const burgerMenu = document.getElementById('burgerMenu');
-            const nav = document.getElementById('nav');
-            const userPanel = document.getElementById('userPanel');
-            const menuOverlay = document.getElementById('menuOverlay');
+        // Получаем статус и ID сотрудника
+        const currentStatus = "{{ member['status'] }}";
+        const staffMemberId = "{{ session.get('staff_member_id', '') }}";
+        const storageKey = `approval_notification_shown_${staffMemberId}`;
 
-            if (burgerMenu) {
-                function toggleMenu() {
-                    burgerMenu.classList.toggle('active');
-                    nav.classList.toggle('active');
-                    if (userPanel) userPanel.classList.toggle('active');
-                    menuOverlay.classList.toggle('active');
-                    document.body.style.overflow = burgerMenu.classList.contains('active') ? 'hidden' : '';
-                }
+        // Проверяем, был ли уже показан уведомление
+        const hasShownNotification = localStorage.getItem(storageKey);
 
-                burgerMenu.addEventListener('click', toggleMenu);
-                menuOverlay.addEventListener('click', toggleMenu);
+        function showApprovalNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'approval-notification';
+            notification.innerHTML = '✅ Поздравляем! Ваш профиль одобрен администратором!';
 
-                nav.querySelectorAll('a').forEach(link => {
-                    link.addEventListener('click', () => {
-                        if (window.innerWidth <= 968) {
-                            toggleMenu();
-                        }
-                    });
-                });
+            document.body.appendChild(notification);
 
-                window.addEventListener('resize', () => {
-                    if (window.innerWidth > 968 && burgerMenu.classList.contains('active')) {
-                        toggleMenu();
-                    }
-                });
-            }
-        });
+            // Отмечаем, что уведомление было показано
+            localStorage.setItem(storageKey, 'true');
 
-        // Обновление имени файла
-        function updateFileName(input) {
-            const fileNameDiv = document.getElementById('fileName');
-            if (input.files && input.files[0]) {
-                fileNameDiv.textContent = '📄 Выбран файл: ' + input.files[0].name;
-            } else {
-                fileNameDiv.textContent = '';
-            }
+            // Удаляем уведомление через 2.5 секунды (чтобы успела проиграться анимация)
+            setTimeout(() => {
+                notification.remove();
+            }, 2500);
         }
+
+        // Если статус одобрен И уведомление еще не было показано - показываем его
+        if (currentStatus === 'approved' && !hasShownNotification) {
+            showApprovalNotification();
+        }
+
+        // Для проверки статуса каждые 10 секунд (если статус может измениться динамически)
+        setInterval(() => {
+            fetch('/api/staff/status')
+                .then(response => response.json())
+                .then(data => {
+                    // Если статус изменился на "одобрен" И уведомление еще не показывалось
+                    if (data.status === 'approved' && currentStatus !== 'approved' && !hasShownNotification) {
+                        showApprovalNotification();
+                        // Немного ждем перед перезагрузкой
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2500);
+                    }
+                })
+                .catch(error => console.log('Ошибка проверки статуса:', error));
+        }, 10000); // Проверка каждые 10 секунд
     </script>
 
 </body>

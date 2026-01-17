@@ -1427,6 +1427,32 @@ body {
         padding: 80px 20px;
     }
 }
+/* ===== BURGER MENU STYLE ===== */
+.burger-menu {
+    display: none; 
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.burger-menu span {
+    width: 30px;
+    height: 3px;
+    background: #e2e8f0; 
+    border-radius: 2px;
+}
+
+
+@media (max-width: 768px) {
+    .burger-menu {
+        display: flex;
+    }
+    
+    .nav-links { 
+        display: none; 
+        
+    }
+}
 
 /* ===== LOGIN & REGISTER STYLES ===== */
 .auth-page {

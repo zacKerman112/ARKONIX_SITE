@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% extends "base.html" %}   
+{% block title %}Зачисления сотрудникам - ARKONIX{% endblock %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Зачисления сотрудникам - ARKONIX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .payments-container {
+            max-width: 1400px;
+            margin: 100px auto 50px;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+        }
+
+        .page-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 900;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            transition: 0.4s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #10b981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #10b981;
+            font-weight: 900;
+        }
+
+        .stat-card p {
+            margin: 10px 0 0 0;
+            color: #cbd5f5;
+        }
+
+        .section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            margin: 0 0 20px 0;
+            color: #10b981;
+            font-size: 1.8em;
+            font-weight: 800;
+        }
+
+        /* Поиск и фильтры */
+        .search-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(2, 6, 23, 0.8);
+            color: #e5e7eb;
+            font-size: 1em;
+            transition: 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(2, 6, 23, 0.8);
+            color: #94a3b8;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-color: #10b981;
+            color: white;
+        }
+
+        .staff-count {
+            padding: 12px 20px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            color: #38bdf8;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Сетка сотрудников */
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .staff-card {
+            background: rgba(2, 6, 23, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .staff-card:hover {
+            border-color: #10b981;
+            transform: translateY(-3px);
+        }
+
+        .staff-card.hidden {
+            display: none;
+        }
+
+        .staff-status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+
+        .status-approved {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .staff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-right: 80px;
+        }
+
+        .staff-info {
+            flex: 1;
+        }
+
+        .staff-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #e5e7eb;
+            margin-bottom: 5px;
+        }
+
+        .staff-position {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .staff-earned {
+            font-size: 1.5em;
+            color: #10b981;
+            font-weight: 900;
+            text-align: right;
+        }
+
+        .staff-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            font-size: 0.85em;
+            color: #64748b;
+        }
+
+        .staff-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pay-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .pay-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(2, 6, 23, 0.8);
+            color: #e5e7eb;
+            transition: 0.3s;
+        }
+
+        .pay-input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .pay-btn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .pay-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .pay-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* История платежей */
+        .payment-item {
+            background: rgba(2, 6, 23, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .payment-item:hover {
+            border-color: #10b981;
+        }
+
+        .payment-item.hidden {
+            display: none;
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .payment-staff {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #e5e7eb;
+        }
+
+        .payment-amount {
+            font-size: 1.3em;
+            color: #10b981;
+            font-weight: 900;
+        }
+
+        .payment-meta {
+            display: flex;
+            gap: 15px;
+            color: #94a3b8;
+            font-size: 0.9em;
+            flex-wrap: wrap;
+        }
+
+        .payment-description {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: #cbd5f5;
+            border-left: 3px solid #10b981;
+        }
+
+        /* Топ сотрудников */
+        .top-earners {
+            display: grid;
+            gap: 15px;
+        }
+
+        .earner-item {
+            background: rgba(2, 6, 23, 0.6);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .earner-item:hover {
+            border-color: #10b981;
+            transform: translateX(5px);
+        }
+
+        .earner-info {
+            flex: 1;
+        }
+
+        .earner-name {
+            font-weight: 700;
+            color: #e5e7eb;
+            font-size: 1.1em;
+        }
+
+        .earner-position {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .earner-earned {
+            font-size: 1.5em;
+            color: #10b981;
+            font-weight: 900;
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Кнопка назад */
+        .btn-back {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: 0.3s;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-back:hover {
+            background: rgba(56, 189, 248, 0.25);
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .search-controls {
+                flex-direction: column;
+            }
+
+            .staff-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pay-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="/" style="color: inherit; text-decoration: none;">ARKONIX</a>
+            </div>
+            <nav class="nav">
+                <a href="/">Главная</a>
+                <a href="/services">Услуги</a>
+                <a href="/team">Команда</a>
+            </nav>
+            <div class="user-panel">
+                <a href="/profile">Админ панель</a>
+                <a href="/logout">Выход</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="payments-container">
+        <a href="/profile" class="btn-back"
+            style="margin-bottom: 20px; display: inline-flex; align-items: center; gap: 8px;">
+            ← Назад в админ-панель
+        </a>
+
+        <div class="page-header">
+            <h1>💵 Зачисления сотрудникам</h1>
+            <p>Управление выплатами команде ARKONIX</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>{% if stats %}{{ stats.get('total_payments', 0) }}{% else %}0{% endif %}</h3>
+                <p>Всего зачислений</p>
+            </div>
+            <div class="stat-card">
+                <h3>{% if stats %}${{ "%.2f"|format(stats.get('total_amount', 0)) }}{% else %}$0.00{% endif %}</h3>
+                <p>Общая сумма</p>
+            </div>
+            <div class="stat-card">
+                <h3>{% if stats %}${{ "%.2f"|format(stats.get('average_amount', 0)) }}{% else %}$0.00{% endif %}</h3>
+                <p>Средняя выплата</p>
+            </div>
+            <div class="stat-card">
+                <h3>{% if staff_members %}{{ staff_members|length }}{% else %}0{% endif %}</h3>
+                <p>Всего сотрудников</p>
+            </div>
+        </div>
+
+        <!-- Топ сотрудников -->
+        {% if top_earners and top_earners|length > 0 %}
+        <div class="section">
+            <h2>🏆 Топ-5 сотрудников по заработку</h2>
+            <div class="top-earners">
+                {% for earner in top_earners %}
+                <div class="earner-item">
+                    <div class="earner-info">
+                        <div class="earner-name">{{ earner.first_name }} {{ earner.last_name }}</div>
+                        <div class="earner-position">{{ earner.position }}</div>
+                    </div>
+                    <div class="earner-earned">${{ "%.2f"|format(earner.total_earned or 0) }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Зачисление сотрудникам -->
+        <div class="section">
+            <h2>⚡ Зачисление сотрудникам</h2>
+
+            {% if staff_members and staff_members|length > 0 %}
+            <!-- Поиск и фильтры -->
+            <div class="search-controls">
+                <div class="search-box">
+                    <input type="text" id="staffSearch" class="search-input"
+                        placeholder="🔍 Поиск по имени, должности или email...">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">
+                        👥 Все (<span id="countAll">{{ staff_members|length }}</span>)
+                    </button>
+                    <button class="filter-btn" data-filter="approved">
+                        ✅ Одобренные (<span id="countApproved">{{ staff_members|selectattr('status', 'equalto',
+                            'approved')|list|length }}</span>)
+                    </button>
+                    <button class="filter-btn" data-filter="pending">
+                        ⏳ Ожидают (<span id="countPending">{{ staff_members|selectattr('status', 'equalto',
+                            'pending')|list|length }}</span>)
+                    </button>
+                </div>
+                <div class="staff-count">
+                    <span>Показано:</span>
+                    <span id="visibleCount">{{ staff_members|length }}</span>
+                </div>
+            </div>
+
+            <!-- Сетка сотрудников -->
+            <div class="staff-grid" id="staffGrid">
+                {% for member in staff_members %}
+                <div class="staff-card" data-status="{{ member.status }}"
+                    data-name="{{ member.first_name }} {{ member.last_name }}" data-position="{{ member.position }}"
+                    data-email="{{ member.email if member.email else '' }}">
+
+                    <span class="staff-status-badge status-{{ member.status }}">
+                        {% if member.status == 'approved' %}
+                        ✅ Одобрен
+                        {% else %}
+                        ⏳ Ожидает
+                        {% endif %}
+                    </span>
+
+                    <div class="staff-header">
+                        <div class="staff-info">
+                            <div class="staff-name">{{ member.first_name }} {{ member.last_name }}</div>
+                            <div class="staff-position">💼 {{ member.position }}</div>
+                        </div>
+                        <div class="staff-earned">${{ "%.2f"|format(member.total_earned or 0) }}</div>
+                    </div>
+
+                    <div class="staff-meta">
+                        <span>🆔 ID: {{ member.id }}</span>
+                        {% if member.email %}
+                        <span>✉️ {{ member.email }}</span>
+                        {% endif %}
+                        <span>👤 @{{ member.username }}</span>
+                    </div>
+
+                    {% if member.status == 'approved' %}
+                    <form action="/api/admin/staff/pay" method="POST" class="pay-form" data-member-id="{{ member.id }}"
+                        onsubmit="return handlePay(event, this.dataset.memberId)">
+                        <input type="hidden" name="member_id" value="{{ member.id }}">
+                        <input type="number" name="amount" step="0.01" min="0.01" placeholder="💰 Сумма"
+                            class="pay-input" required>
+                        <input type="text" name="description" placeholder="💬 Описание" class="pay-input">
+                        <button type="submit" class="pay-btn">💵 Зачислить</button>
+                    </form>
+                    {% else %}
+                    <div style="text-align: center; padding: 15px; background: rgba(251, 191, 36, 0.1); 
+                                border-radius: 8px; color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3);">
+                        ⏳ Сотрудник ожидает одобрения администратором
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Сообщение если нет результатов -->
+            <div class="empty-state" id="noResults" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <h3>Ничего не найдено</h3>
+                <p>Попробуйте изменить параметры поиска или фильтры</p>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <h3>👥 Нет сотрудников</h3>
+                <p>Сотрудники появятся после регистрации через форму</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- История зачислений -->
+        <div class="section">
+            <h2>📋 История зачислений ({% if payments %}{{ payments|length }}{% else %}0{% endif %})</h2>
+
+            {% if payments and payments|length > 0 %}
+            <!-- Поиск по истории -->
+            <div class="search-controls" style="margin-bottom: 20px;">
+                <div class="search-box">
+                    <input type="text" id="paymentSearch" class="search-input"
+                        placeholder="🔍 Поиск по сотруднику, сумме или описанию...">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </div>
+
+            <div id="paymentsList">
+                {% for payment in payments %}
+                <div class="payment-item" data-staff="{{ payment.first_name }} {{ payment.last_name }}"
+                    data-description="{{ payment.description if payment.description else '' }}"
+                    data-amount="{{ payment.amount }}">
+                    <div class="payment-header">
+                        <div class="payment-staff">
+                            👤 {{ payment.first_name }} {{ payment.last_name }}
+                        </div>
+                        <div class="payment-amount">+${{ "%.2f"|format(payment.amount) }}</div>
+                    </div>
+                    <div class="payment-meta">
+                        <span>💼 {{ payment.position }}</span>
+                        <span>👤 От: {{ payment.admin_username }}</span>
+                        <span>📅 {{ payment.created_at[:16] if payment.created_at else 'Недавно' }}</span>
+                    </div>
+                    {% if payment.description %}
+                    <div class="payment-description">
+                        💬 {{ payment.description }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Сообщение если нет результатов поиска в истории -->
+            <div class="empty-state" id="noPaymentResults" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <h3>Ничего не найдено</h3>
+                <p>Попробуйте изменить поисковый запрос</p>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3>📭 Пока нет зачислений</h3>
+                <p>История зачислений появится после первой выплаты</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>Телефон: +38 095 713 66 14</p>
+                <p>Email: itw23265@gmail.com</p>
+            </div>
+            <div class="footer-section">
+                <h4>Соцсети</h4>
+                <a href="https://t.me/worldit23">Telegram</a><br>
+                <a href="https://discord.gg/uKzRMmshnp">Discord</a>
+            </div>
+            <div class="footer-section">
+                <a href="/terms">Условия использования</a>
+                <a href="/privacy">Политика и правила</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 ARKONIX. Все права защищены.
+        </div>
+    </footer>
+
+    <script>
+        // Обработчик зачисления
+        async function handlePay(e, memberId) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            // Блокируем кнопку
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Обработка...';
+
+            try {
+                const response = await fetch('/api/admin/staff/pay', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        member_id: parseInt(formData.get('member_id')),
+                        amount: parseFloat(formData.get('amount')),
+                        description: formData.get('description')
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    location.reload();
+                } else {
+                    alert('❌ Ошибка: ' + data.error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '💵 Зачислить';
+                }
+            } catch (error) {
+                alert('❌ Ошибка: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💵 Зачислить';
+            }
+
+            return false;
+        }
+
+        // Поиск и фильтрация сотрудников
+        const staffSearch = document.getElementById('staffSearch');
+        const staffGrid = document.getElementById('staffGrid');
+        const staffCards = staffGrid ? staffGrid.querySelectorAll('.staff-card') : [];
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const noResults = document.getElementById('noResults');
+        const visibleCount = document.getElementById('visibleCount');
+
+        let currentFilter = 'all';
+
+        // Функция фильтрации
+        function filterStaff() {
+            if (!staffSearch || !staffGrid || staffCards.length === 0) return;
+
+            const searchTerm = staffSearch.value.toLowerCase();
+            let visibleCards = 0;
+
+            staffCards.forEach(card => {
+                const status = card.dataset.status || '';
+                const name = (card.dataset.name || '').toLowerCase();
+                const position = (card.dataset.position || '').toLowerCase();
+                const email = (card.dataset.email || '').toLowerCase();
+
+                // Проверка фильтра
+                const matchesFilter = currentFilter === 'all' || status === currentFilter;
+
+                // Проверка поиска
+                const matchesSearch = searchTerm === '' ||
+                    name.includes(searchTerm) ||
+                    position.includes(searchTerm) ||
+                    email.includes(searchTerm);
+
+                if (matchesFilter && matchesSearch) {
+                    card.classList.remove('hidden');
+                    visibleCards++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Показываем/скрываем сообщение "ничего не найдено"
+            if (visibleCards === 0) {
+                if (noResults) noResults.style.display = 'block';
+                if (staffGrid) staffGrid.style.display = 'none';
+            } else {
+                if (noResults) noResults.style.display = 'none';
+                if (staffGrid) staffGrid.style.display = 'grid';
+            }
+
+            // Обновляем счетчик
+            if (visibleCount) visibleCount.textContent = visibleCards;
+        }
+
+        // Обработчик поиска
+        if (staffSearch) {
+            staffSearch.addEventListener('input', filterStaff);
+        }
+
+        // Обработчики фильтров
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                // Убираем активный класс со всех кнопок
+                filterButtons.forEach(b => b.classList.remove('active'));
+                // Добавляем активный класс на нажатую кнопку
+                this.classList.add('active');
+
+                // Устанавливаем текущий фильтр
+                currentFilter = this.dataset.filter;
+
+                // Применяем фильтрацию
+                filterStaff();
+            });
+        });
+
+        // Поиск по истории платежей
+        const paymentSearch = document.getElementById('paymentSearch');
+        const paymentsList = document.getElementById('paymentsList');
+        const paymentItems = paymentsList ? paymentsList.querySelectorAll('.payment-item') : [];
+        const noPaymentResults = document.getElementById('noPaymentResults');
+
+        if (paymentSearch && paymentItems.length > 0) {
+            paymentSearch.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase();
+                let visiblePayments = 0;
+
+                paymentItems.forEach(item => {
+                    const staff = (item.dataset.staff || '').toLowerCase();
+                    const description = (item.dataset.description || '').toLowerCase();
+                    const amount = item.dataset.amount || '';
+
+                    const matchesSearch = searchTerm === '' ||
+                        staff.includes(searchTerm) ||
+                        description.includes(searchTerm) ||
+                        amount.includes(searchTerm);
+
+                    if (matchesSearch) {
+                        item.classList.remove('hidden');
+                        visiblePayments++;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+
+                // Показываем/скрываем сообщение "ничего не найдено"
+                if (visiblePayments === 0 && paymentItems.length > 0) {
+                    if (noPaymentResults) noPaymentResults.style.display = 'block';
+                    if (paymentsList) paymentsList.style.display = 'none';
+                } else {
+                    if (noPaymentResults) noPaymentResults.style.display = 'none';
+                    if (paymentsList) paymentsList.style.display = 'block';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

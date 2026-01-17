@@ -1,41 +1,381 @@
 <!DOCTYPE html>
-<html lang="ru">
-
+<html lang="{{ session.get('language', 'uk') }}">
+{% extends "base.html" %}
+{% block title %}{{ t('team') }} - ARKONIX{% endblock %}
+{% block content %}
 <head>
     <meta charset="UTF-8">
-    <title>Команда | ARKONIX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('team') }} | ARKONIX</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* ========== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКОВ ========== */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 1005;
+        }
+
+        .language-btn {
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #38bdf8;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .language-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 180px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1004;
+        }
+
+        .language-dropdown.active {
+            display: flex;
+        }
+
+        .language-option {
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95em;
+        }
+
+        .language-option:hover {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            transform: translateX(5px);
+        }
+
+        .language-option.current {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .lang-flag {
+            font-size: 1.3em;
+        }
+
+        /* ========== БУРГЕР-МЕНЮ ========== */
+        .burger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            z-index: 1006;
+            padding: 12px;
+            background: rgba(56, 189, 248, 0.05);
+            border-radius: 10px;
+            border: 2px solid rgba(56, 189, 248, 0.2);
+            transition: all 0.3s ease;
+            width: 48px;
+            height: 48px;
+        }
+
+        .burger-menu:hover {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: scale(1.05);
+        }
+
+        .burger-menu:active {
+            transform: scale(0.95);
+        }
+
+        .burger-line {
+            width: 26px;
+            height: 3px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            border-radius: 3px;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: 0 2px 4px rgba(56, 189, 248, 0.3);
+        }
+
+        .burger-menu:hover .burger-line {
+            background: linear-gradient(90deg, #818cf8, #38bdf8);
+            box-shadow: 0 3px 8px rgba(56, 189, 248, 0.5);
+        }
+
+        .burger-menu.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.6);
+        }
+
+        .burger-menu.active .burger-line:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+
+        .burger-menu.active .burger-line:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .burger-menu.active .burger-line:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* ========== МОБИЛЬНОЕ МЕНЮ ========== */
+        @media (max-width: 968px) {
+            .burger-menu {
+                display: flex !important;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+            }
+
+            .language-switcher {
+                top: 15px;
+                right: 15px;
+            }
+
+            .nav {
+                position: fixed !important;
+                top: 0 !important;
+                left: -100% !important;
+                width: 280px !important;
+                max-width: 75vw !important;
+                height: auto !important;
+                max-height: 65vh !important;
+                background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
+                flex-direction: column !important;
+                padding: 22px 16px !important;
+                gap: 10px !important;
+                z-index: 1000 !important;
+                transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+                box-shadow: 10px 0 40px rgba(0, 0, 0, 0.8) !important;
+                border: 3px solid rgba(56, 189, 248, 0.3);
+                border-left: none;
+                border-bottom-right-radius: 15px;
+            }
+
+            .nav.active {
+                left: 0 !important;
+            }
+
+            .nav a {
+                padding: 15px 18px !important;
+                margin: 0 !important;
+                border-radius: 10px !important;
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1)) !important;
+                border: 2px solid rgba(56, 189, 248, 0.25) !important;
+                font-size: 1em !important;
+                font-weight: 600 !important;
+                text-align: center !important;
+                color: #e2e8f0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-height: 50px !important;
+                height: 50px !important;
+                text-decoration: none !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .nav a:hover {
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(129, 140, 248, 0.25)) !important;
+                border-color: rgba(56, 189, 248, 0.5) !important;
+                transform: scale(1.02) !important;
+                color: #38bdf8 !important;
+            }
+
+            .user-panel {
+                position: fixed !important;
+                bottom: 25px !important;
+                left: -100% !important;
+                width: 280px !important;
+                max-width: 75vw !important;
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+                padding: 16px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 10px !important;
+                z-index: 1000 !important;
+                transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+                border: 3px solid rgba(56, 189, 248, 0.4) !important;
+                border-left: none !important;
+                border-radius: 0 15px 15px 0;
+            }
+
+            .user-panel.active {
+                left: 0 !important;
+            }
+
+            .user-panel a {
+                padding: 15px 18px !important;
+                margin: 0 !important;
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(129, 140, 248, 0.15)) !important;
+                border: 2px solid rgba(56, 189, 248, 0.3) !important;
+                border-radius: 10px !important;
+                text-align: center !important;
+                font-weight: 700 !important;
+                font-size: 1em !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-height: 50px !important;
+                height: 50px !important;
+                color: #e2e8f0 !important;
+                text-decoration: none !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .user-panel a:hover {
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(129, 140, 248, 0.3)) !important;
+                transform: scale(1.02) !important;
+                color: #38bdf8 !important;
+            }
+
+            .logo {
+                margin-left: 70px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
     <header class="header">
         <div class="container header-container">
+            <div class="burger-menu" id="burgerMenu">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </div>
+
             <div class="logo">ARKONIX</div>
 
-            <nav class="nav">
-                <a href="{{ url_for('main') }}">Главная</a>
-                <a href="{{ url_for('services') }}">Услуги</a>
-                <a href="{{ url_for('team') }}">Команда</a>
+            <nav class="nav" id="nav">
+                <a href="{{ url_for('main') }}">{{ t('main') }}</a>
+                <a href="{{ url_for('services') }}">{{ t('services') }}</a>
+                <a href="{{ url_for('team') }}">{{ t('team') }}</a>
                 {% if session.user_id %}
-                <a href="/discussions">Обсуждения</a>
+                <a href="/discussions">{{ t('discussions') }}</a>
                 {% endif %}
             </nav>
 
-            <div class="user-panel">
+            <div class="language-switcher">
+                <button class="language-btn" id="langBtn" type="button">
+                    <span class="lang-flag">
+                        {% if session.get('language') == 'uk' %}🇺🇦
+                        {% elif session.get('language') == 'ru' %}🇷🇺
+                        {% elif session.get('language') == 'en' %}🇬🇧
+                        {% elif session.get('language') == 'de' %}🇩🇪
+                        {% elif session.get('language') == 'it' %}🇮🇹
+                        {% elif session.get('language') == 'fr' %}🇫🇷
+                        {% elif session.get('language') == 'zh' %}🇨🇳
+                        {% else %}🇺🇦
+                        {% endif %}
+                    </span>
+                    <span>{{ session.get('language', 'uk').upper() }}</span>
+                </button>
+                <div class="language-dropdown" id="langDropdown">
+                    <a href="{{ url_for('set_language', lang='uk') }}"
+                        class="language-option {% if session.get('language', 'uk') == 'uk' %}current{% endif %}">
+                        <span class="lang-flag">🇺🇦</span> Українська
+                    </a>
+                    <a href="{{ url_for('set_language', lang='ru') }}"
+                        class="language-option {% if session.get('language') == 'ru' %}current{% endif %}">
+                        <span class="lang-flag">🇷🇺</span> Русский
+                    </a>
+                    <a href="{{ url_for('set_language', lang='en') }}"
+                        class="language-option {% if session.get('language') == 'en' %}current{% endif %}">
+                        <span class="lang-flag">🇬🇧</span> English
+                    </a>
+                    <a href="{{ url_for('set_language', lang='de') }}"
+                        class="language-option {% if session.get('language') == 'de' %}current{% endif %}">
+                        <span class="lang-flag">🇩🇪</span> Deutsch
+                    </a>
+                    <a href="{{ url_for('set_language', lang='it') }}"
+                        class="language-option {% if session.get('language') == 'it' %}current{% endif %}">
+                        <span class="lang-flag">🇮🇹</span> Italiano
+                    </a>
+                    <a href="{{ url_for('set_language', lang='fr') }}"
+                        class="language-option {% if session.get('language') == 'fr' %}current{% endif %}">
+                        <span class="lang-flag">🇫🇷</span> Français
+                    </a>
+                    <a href="{{ url_for('set_language', lang='zh') }}"
+                        class="language-option {% if session.get('language') == 'zh' %}current{% endif %}">
+                        <span class="lang-flag">🇨🇳</span> 中文
+                    </a>
+                </div>
+            </div>
+
+            <div class="user-panel" id="userPanel">
                 {% if session.user_id %}
-                {% if session.role in ['admin', 'staff'] %}
-                <a href="{{ url_for('profile') }}">Админ-панель</a>
+                {% if session.role == 'admin' %}
+                <a href="{{ url_for('profile') }}">{{ t('admin_panel') }}</a>
+                {% elif session.role == 'staff' or session.role == 'staff_pending' %}
+                <a href="/staff/profile">{{ t('profile') }}</a>
                 {% else %}
-                <a href="{{ url_for('profile') }}">Личный кабинет</a>
+                <a href="{{ url_for('profile') }}">{{ t('profile') }}</a>
                 {% endif %}
-                <a href="{{ url_for('logout') }}">Выход</a>
+                <a href="{{ url_for('logout') }}">{{ t('logout') }}</a>
                 {% else %}
-                <a href="{{ url_for('login') }}">Войти</a>
-                <a href="{{ url_for('register') }}">Регистрация</a>
+                <a href="{{ url_for('login') }}">{{ t('login') }}</a>
+                <a href="{{ url_for('register') }}">{{ t('register') }}</a>
                 {% endif %}
             </div>
         </div>
+        <div class="menu-overlay" id="menuOverlay"></div>
     </header>
 
     <main class="team-section" style="padding-top: 100px;">
@@ -46,10 +386,10 @@
 
             <div class="team-card">
                 <div class="avatar">
-                    <img src="{{ url_for('static', filename='img/alexey.jpg') }}" alt="Роман">
+                    <img src="{{ url_for('static', filename='img/Number_1.png') }}" alt="Роман">
                 </div>
                 <h3 class="name">Роман Литвицкий</h3>
-                <p class="role">SEO компании</p>
+                <p class="role">CEO компании</p>
                 <div class="contacts">
                     <p><strong>Telegram:</strong> <a href="https://t.me/DraveFafner" target="_blank">@DraveFafner</a>
                     </p>
@@ -60,15 +400,17 @@
                     <span>Python</span>
                     <span>Backend</span>
                     <span>Django</span>
+                    <span>Task Assignment</span>
+                    <span>Client Communication</span>
                     <span>Team Leader</span>
                 </div>
             </div>
 
             <div class="team-card">
                 <div class="avatar">
-                    <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Фёдор">
+                    <img src="{{ url_for('static', filename='img/Number_3.jpg') }}" alt="Богдан">
                 </div>
-                <h3 class="name">Фёдор Смирнов</h3>
+                <h3 class="name">Богдан Артеменко</h3>
                 <p class="role">Project Manager</p>
                 <div class="skills">
                     <span>Analytics</span>
@@ -80,7 +422,7 @@
 
             <div class="team-card">
                 <div class="avatar">
-                    <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
+                    <img src="{{ url_for('static', filename='img/Number_4.png') }}" alt="Радион">
                 </div>
                 <h3 class="name">Радион Пилипенко</h3>
                 <p class="role">Backend Lead</p>
@@ -94,28 +436,13 @@
 
             <div class="team-card">
                 <div class="avatar">
-                    <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
+                    <img src="{{ url_for('static', filename='img/Number_2.png') }}" alt="Назар">
                 </div>
-                <h3 class="name">Радион Пилипенко</h3>
-                <p class="role">Backend Lead</p>
+                <h3 class="name">Назар Тотовский</h3>
+                <p class="role">Frontend Lead</p>
                 <div class="skills">
-                    <span>Python</span>
-                    <span>Java</span>
-                    <span>Backend</span>
-                    <span>Team Leader</span>
-                </div>
-            </div>
-
-            <div class="team-card">
-                <div class="avatar">
-                    <img src="{{ url_for('static', filename='img/marina.jpg') }}" alt="Радион">
-                </div>
-                <h3 class="name">Радион Пилипенко</h3>
-                <p class="role">Backend Lead</p>
-                <div class="skills">
-                    <span>Python</span>
-                    <span>Java</span>
-                    <span>Backend</span>
+                    <span>Designer</span>
+                    <span>Frontend</span>
                     <span>Team Leader</span>
                 </div>
             </div>
@@ -126,27 +453,86 @@
     <footer class="footer">
         <div class="container footer-container">
             <div class="footer-section">
-                <h4>Контакты</h4>
+                <h4>{{ t('contacts') }}</h4>
                 <p>Телефон: +38 095 713 66 14</p>
                 <p>Email: itw23265@gmail.com</p>
             </div>
 
             <div class="footer-section">
-                <h4>Соцсети</h4>
+                <h4>{{ t('social_networks') }}</h4>
                 <a href="https://t.me/worldit23">Telegram</a><br>
                 <a href="https://discord.gg/uKzRMmshnp">Discord</a>
             </div>
 
             <div class="footer-section">
-                <a href="{{ url_for('terms') }}">Условия использования</a>
-                <a href="{{ url_for('privacy') }}">Политика и правила</a>
+                <a href="{{ url_for('terms') }}">{{ t('terms') }}</a>
+                <a href="{{ url_for('privacy') }}">{{ t('privacy') }}</a>
+                <a href="{{ url_for('offer')}}">Публічна оферта</a>
             </div>
         </div>
 
         <div class="footer-bottom">
-            &copy; 2025 ARKONIX. Все права защищены.
+            &copy; 2025 ARKONIX. {{ t('rights_reserved') }}.
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const burgerMenu = document.getElementById('burgerMenu');
+            const nav = document.getElementById('nav');
+            const userPanel = document.getElementById('userPanel');
+            const menuOverlay = document.getElementById('menuOverlay');
+            const langBtn = document.getElementById('langBtn');
+            const langDropdown = document.getElementById('langDropdown');
+
+            // Переключатель языков
+            if (langBtn && langDropdown) {
+                langBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    langDropdown.classList.toggle('active');
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!langBtn.contains(e.target) && !langDropdown.contains(e.target)) {
+                        langDropdown.classList.remove('active');
+                    }
+                });
+            }
+
+            // Бургер-меню
+            if (burgerMenu) {
+                function toggleMenu() {
+                    const isActive = burgerMenu.classList.contains('active');
+                    burgerMenu.classList.toggle('active');
+                    nav.classList.toggle('active');
+                    if (userPanel) userPanel.classList.toggle('active');
+                    menuOverlay.classList.toggle('active');
+                    document.body.style.overflow = !isActive ? 'hidden' : '';
+                }
+
+                burgerMenu.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    toggleMenu();
+                });
+
+                menuOverlay.addEventListener('click', toggleMenu);
+
+                nav.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth <= 968) toggleMenu();
+                    });
+                });
+
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 968 && burgerMenu.classList.contains('active')) toggleMenu();
+                });
+
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && burgerMenu.classList.contains('active')) toggleMenu();
+                });
+            }
+        });
+    </script>
 
 </body>
 

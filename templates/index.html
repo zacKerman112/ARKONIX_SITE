@@ -1,15 +1,97 @@
 <!DOCTYPE html>
-<html lang="ru">
-
+<html lang="{{ session.get('language', 'uk') }}">
+{% extends "base.html" %}
+{% block title %}ARKONIX - {{ t('welcome_title') }}{% endblock %}
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARKONIX - Разработка веб-приложений и AI-решений</title>
+    <title>ARKONIX - {{ t('welcome_title') }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        /* ДОБАВЛЕНО: Плавная прокрутка */
         html {
             scroll-behavior: smooth;
+        }
+
+        /* ========== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКОВ ========== */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 1005;
+        }
+
+        .language-btn {
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #38bdf8;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .language-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 180px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1004;
+        }
+
+        .language-dropdown.active {
+            display: flex;
+        }
+
+        .language-option {
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95em;
+        }
+
+        .language-option:hover {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            transform: translateX(5px);
+        }
+
+        .language-option.current {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .lang-flag {
+            font-size: 1.3em;
         }
 
         /* Красивые звёзды для отзывов */
@@ -33,7 +115,6 @@
             filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.8)) !important;
         }
 
-        /* Волновая анимация для каждой звезды */
         .stars .star:nth-child(1) {
             animation: starTwinkle 2.5s ease-in-out infinite !important;
         }
@@ -82,7 +163,6 @@
             position: relative !important;
         }
 
-        /* Красивый селект со звёздами */
         .review-form select {
             font-size: 1.2em !important;
             padding: 14px !important;
@@ -101,7 +181,6 @@
             background: rgba(56, 189, 248, 0.2) !important;
         }
 
-        /* Звёзды в селекте */
         .review-form select {
             filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
         }
@@ -110,38 +189,64 @@
             filter: drop-shadow(0 4px 8px rgba(255, 215, 0, 0.5));
         }
 
-        /* ========== БУРГЕР-МЕНЮ ДЛЯ МОБИЛЬНЫХ ========== */
+        /* ========== УЛУЧШЕННОЕ БУРГЕР-МЕНЮ ========== */
         .burger-menu {
             display: none;
             flex-direction: column;
-            gap: 5px;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
             cursor: pointer;
-            z-index: 1001;
-            padding: 10px;
+            z-index: 1006;
+            padding: 12px;
+            background: rgba(56, 189, 248, 0.05);
+            border-radius: 10px;
+            border: 2px solid rgba(56, 189, 248, 0.2);
+            transition: all 0.3s ease;
+            width: 48px;
+            height: 48px;
+        }
+
+        .burger-menu:hover {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: scale(1.05);
+        }
+
+        .burger-menu:active {
+            transform: scale(0.95);
         }
 
         .burger-line {
-            width: 28px;
+            width: 26px;
             height: 3px;
             background: linear-gradient(90deg, #38bdf8, #818cf8);
             border-radius: 3px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: 0 2px 4px rgba(56, 189, 248, 0.3);
         }
 
         .burger-menu:hover .burger-line {
             background: linear-gradient(90deg, #818cf8, #38bdf8);
+            box-shadow: 0 3px 8px rgba(56, 189, 248, 0.5);
+        }
+
+        .burger-menu.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.6);
         }
 
         .burger-menu.active .burger-line:nth-child(1) {
-            transform: translateY(8px) rotate(45deg);
+            transform: translateY(9px) rotate(45deg);
         }
 
         .burger-menu.active .burger-line:nth-child(2) {
             opacity: 0;
+            transform: translateX(-20px);
         }
 
         .burger-menu.active .burger-line:nth-child(3) {
-            transform: translateY(-8px) rotate(-45deg);
+            transform: translateY(-9px) rotate(-45deg);
         }
 
         .menu-overlay {
@@ -151,8 +256,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
             z-index: 999;
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -163,67 +268,126 @@
             opacity: 1;
         }
 
-        /* Адаптивность для планшетов и телефонов */
+        /* ========== МОБИЛЬНОЕ МЕНЮ С РАЗДЕЛАМИ ========== */
         @media (max-width: 968px) {
             .burger-menu {
                 display: flex !important;
+                position: fixed;
+                top: 15px;
+                left: 15px;
             }
 
+            .language-switcher {
+                top: 15px;
+                right: 15px;
+            }
+
+            .language-dropdown {
+                right: 0;
+                left: auto;
+            }
+
+            /* Мобильная навигация */
             .nav {
                 position: fixed !important;
                 top: 0 !important;
-                right: -100% !important;
-                width: 320px !important;
-                max-width: 85vw !important;
-                height: 100vh !important;
-                background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+                bottom: auto !important;
+                left: -100% !important;
+                transform: none !important;
+                width: 280px !important;
+                max-width: 75vw !important;
+                height: auto !important;
+                max-height: 65vh !important;
+                background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
                 flex-direction: column !important;
-                padding: 90px 25px 30px !important;
-                gap: 0 !important;
+                padding: 22px 16px !important;
+                gap: 10px !important;
                 z-index: 1000 !important;
-                transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
-                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.7) !important;
+                transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+                box-shadow: 10px 0 40px rgba(0, 0, 0, 0.8) !important;
                 overflow-y: auto !important;
+                border: 3px solid rgba(56, 189, 248, 0.3);
+                border-left: none;
+                border-bottom-right-radius: 15px;
             }
 
             .nav.active {
-                right: 0 !important;
+                left: 0 !important;
             }
 
+            /* Навигационные ссылки */
             .nav a {
-                padding: 18px 20px !important;
-                margin: 8px 0 !important;
-                border-radius: 12px !important;
-                background: rgba(56, 189, 248, 0.08) !important;
-                border: 1px solid rgba(56, 189, 248, 0.15) !important;
+                padding: 15px 18px !important;
+                margin: 0 !important;
+                border-radius: 10px !important;
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1)) !important;
+                border: 2px solid rgba(56, 189, 248, 0.25) !important;
                 transition: all 0.3s ease !important;
-                font-size: 1.1em !important;
-                text-align: left !important;
+                font-size: 1em !important;
+                font-weight: 600 !important;
+                text-align: center !important;
+                color: #e2e8f0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                overflow: hidden !important;
+                min-height: 50px !important;
+                height: 50px !important;
+                line-height: 1.3 !important;
+                text-decoration: none !important;
+            }
+
+            .nav a::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 0;
+                background: linear-gradient(90deg, rgba(56, 189, 248, 0.15), transparent);
+                transition: width 0.3s ease;
+                z-index: 0;
+            }
+
+            .nav a span {
+                position: relative;
+                z-index: 1;
+            }
+
+            .nav a:hover::after,
+            .nav a:active::after {
+                width: 100%;
             }
 
             .nav a:hover,
             .nav a:active {
-                background: rgba(56, 189, 248, 0.2) !important;
-                border-color: rgba(56, 189, 248, 0.4) !important;
-                transform: translateX(-8px) !important;
-                box-shadow: 5px 0 15px rgba(56, 189, 248, 0.3) !important;
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(129, 140, 248, 0.25)) !important;
+                border-color: rgba(56, 189, 248, 0.5) !important;
+                transform: scale(1.02) !important;
+                box-shadow: 0 5px 20px rgba(56, 189, 248, 0.4) !important;
+                color: #38bdf8 !important;
             }
 
+            /* Панель пользователя внизу */
             .user-panel {
                 position: fixed !important;
-                bottom: 0 !important;
+                bottom: 25px !important;
                 left: -100% !important;
                 right: auto !important;
-                width: 100% !important;
-                background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
-                padding: 25px 20px 30px !important;
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 12px !important;
+                width: 280px !important;
+                max-width: 75vw !important;
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+                padding: 16px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 10px !important;
                 z-index: 1000 !important;
                 transition: left 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
-                border-top: 3px solid rgba(56, 189, 248, 0.3) !important;
-                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.7) !important;
+                border: 3px solid rgba(56, 189, 248, 0.4) !important;
+                border-left: none !important;
+                box-shadow: 10px 10px 40px rgba(0, 0, 0, 0.8) !important;
+                border-radius: 0 15px 15px 0;
             }
 
             .user-panel.active {
@@ -231,10 +395,11 @@
             }
 
             .user-panel a {
-                padding: 16px 18px !important;
+                padding: 15px 18px !important;
+                margin: 0 !important;
                 background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(129, 140, 248, 0.15)) !important;
                 border: 2px solid rgba(56, 189, 248, 0.3) !important;
-                border-radius: 14px !important;
+                border-radius: 10px !important;
                 text-align: center !important;
                 font-weight: 700 !important;
                 font-size: 1em !important;
@@ -242,16 +407,41 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                min-height: 56px !important;
-                white-space: nowrap !important;
+                min-height: 50px !important;
+                height: 50px !important;
+                line-height: 1.3 !important;
+                color: #e2e8f0 !important;
+                text-decoration: none !important;
+                position: relative !important;
+                overflow: hidden !important;
+            }
+
+            .user-panel a::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: radial-gradient(circle, rgba(56, 189, 248, 0.3), transparent);
+                transform: translate(-50%, -50%);
+                transition: width 0.4s ease, height 0.4s ease;
+                border-radius: 50%;
+            }
+
+            .user-panel a:hover::before,
+            .user-panel a:active::before {
+                width: 300px;
+                height: 300px;
             }
 
             .user-panel a:hover,
             .user-panel a:active {
                 background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(129, 140, 248, 0.3)) !important;
-                transform: translateY(-3px) !important;
-                box-shadow: 0 8px 25px rgba(56, 189, 248, 0.5) !important;
-                border-color: rgba(56, 189, 248, 0.6) !important;
+                transform: scale(1.02) !important;
+                box-shadow: 0 8px 25px rgba(56, 189, 248, 0.6) !important;
+                border-color: rgba(56, 189, 248, 0.7) !important;
+                color: #38bdf8 !important;
             }
 
             .header-container {
@@ -260,63 +450,140 @@
 
             .logo {
                 z-index: 1001 !important;
+                margin-left: 70px;
             }
         }
 
-        /* Средние экраны (планшеты в портретной ориентации) */
+        /* Планшеты */
         @media (max-width: 768px) and (min-width: 481px) {
+            .nav {
+                width: 260px !important;
+                padding: 20px 14px !important;
+                gap: 8px !important;
+                top: 0 !important;
+            }
+
             .user-panel {
-                padding: 22px 20px 28px !important;
+                width: 260px !important;
+                padding: 14px !important;
+                gap: 8px !important;
+                bottom: 20px !important;
             }
 
             .user-panel a {
-                padding: 16px 18px !important;
-                min-height: 54px !important;
-                font-size: 0.98em !important;
+                padding: 14px 16px !important;
+                min-height: 48px !important;
+                height: 48px !important;
+                font-size: 0.95em !important;
+            }
+
+            .nav a {
+                padding: 14px 16px !important;
+                font-size: 0.95em !important;
+                min-height: 48px !important;
+                height: 48px !important;
             }
         }
 
         /* Маленькие телефоны */
         @media (max-width: 480px) {
+            .burger-menu {
+                width: 44px !important;
+                height: 44px !important;
+                padding: 10px !important;
+                top: 12px !important;
+                left: 12px !important;
+            }
+
             .burger-line {
                 width: 24px !important;
                 height: 2.5px !important;
             }
 
+            .language-switcher {
+                top: 12px;
+                right: 12px;
+            }
+
+            .language-btn {
+                padding: 6px 12px;
+                font-size: 0.85em;
+                min-width: 85px;
+            }
+
             .nav {
-                padding: 80px 20px 25px !important;
-                width: 100% !important;
-                max-width: 100vw !important;
+                padding: 18px 12px !important;
+                width: 85% !important;
+                max-width: 85vw !important;
+                gap: 8px !important;
+                top: 0 !important;
             }
 
             .nav a {
-                font-size: 1em !important;
-                padding: 16px 18px !important;
+                font-size: 0.9em !important;
+                padding: 12px 14px !important;
+                min-height: 46px !important;
+                height: 46px !important;
             }
 
             .user-panel {
-                padding: 20px 15px 25px !important;
-                grid-template-columns: 1fr !important;
-                gap: 10px !important;
+                width: 85% !important;
+                max-width: 85vw !important;
+                padding: 12px !important;
+                gap: 8px !important;
+                bottom: 20px !important;
             }
 
             .user-panel a {
-                padding: 15px 16px !important;
-                font-size: 0.95em !important;
-                min-height: 52px !important;
+                padding: 12px 14px !important;
+                font-size: 0.9em !important;
+                min-height: 46px !important;
+                height: 46px !important;
+            }
+
+            .logo {
+                margin-left: 60px !important;
+                font-size: 1.3em !important;
             }
         }
 
         /* Очень маленькие экраны */
         @media (max-width: 360px) {
+            .burger-menu {
+                width: 40px !important;
+                height: 40px !important;
+                padding: 8px !important;
+            }
+
+            .nav {
+                padding: 16px 10px !important;
+                gap: 6px !important;
+                top: 0 !important;
+            }
+
+            .nav a {
+                font-size: 0.85em !important;
+                padding: 11px 12px !important;
+                min-height: 44px !important;
+                height: 44px !important;
+            }
+
             .user-panel {
-                padding: 18px 12px 22px !important;
+                padding: 10px !important;
+                bottom: 15px !important;
+                gap: 6px !important;
             }
 
             .user-panel a {
-                padding: 13px 14px !important;
-                font-size: 0.9em !important;
-                min-height: 48px !important;
+                padding: 11px 12px !important;
+                font-size: 0.85em !important;
+                min-height: 44px !important;
+                height: 44px !important;
+            }
+
+            .logo {
+                margin-left: 55px !important;
+                font-size: 1.2em !important;
             }
         }
     </style>
@@ -326,36 +593,85 @@
 
     <header class="header">
         <div class="container header-container">
-            <div class="logo">
-                ARKONIX
-            </div>
-
             <div class="burger-menu" id="burgerMenu">
                 <span class="burger-line"></span>
                 <span class="burger-line"></span>
                 <span class="burger-line"></span>
             </div>
 
+            <div class="logo">
+                ARKONIX
+            </div>
+
             <nav class="nav" id="nav">
-                <a href="{{ url_for('main') }}">Главная</a>
-                <a href="{{ url_for('services') }}">Услуги</a>
-                <a href="{{ url_for('team') }}">Команда</a>
+                <a href="{{ url_for('main') }}">{{ t('main') }}</a>
+                <a href="{{ url_for('services') }}">{{ t('services') }}</a>
+                <a href="{{ url_for('team') }}">{{ t('team') }}</a>
                 {% if session.user_id %}
-                <a href="/discussions">Обсуждения</a>
+                <a href="/discussions">{{ t('discussions') }}</a>
                 {% endif %}
             </nav>
+
+            <div class="language-switcher">
+                <button class="language-btn" id="langBtn" type="button">
+                    <span class="lang-flag">
+                        {% if session.get('language') == 'uk' %}🇺🇦
+                        {% elif session.get('language') == 'ru' %}🇷🇺
+                        {% elif session.get('language') == 'en' %}🇬🇧
+                        {% elif session.get('language') == 'de' %}🇩🇪
+                        {% elif session.get('language') == 'it' %}🇮🇹
+                        {% elif session.get('language') == 'fr' %}🇫🇷
+                        {% elif session.get('language') == 'zh' %}🇨🇳
+                        {% else %}🇺🇦
+                        {% endif %}
+                    </span>
+                    <span>{{ session.get('language', 'uk').upper() }}</span>
+                </button>
+                <div class="language-dropdown" id="langDropdown">
+                    <a href="{{ url_for('set_language', lang='uk') }}"
+                        class="language-option {% if session.get('language', 'uk') == 'uk' %}current{% endif %}">
+                        <span class="lang-flag">🇺🇦</span> Українська
+                    </a>
+                    <a href="{{ url_for('set_language', lang='ru') }}"
+                        class="language-option {% if session.get('language') == 'ru' %}current{% endif %}">
+                        <span class="lang-flag">🇷🇺</span> Русский
+                    </a>
+                    <a href="{{ url_for('set_language', lang='en') }}"
+                        class="language-option {% if session.get('language') == 'en' %}current{% endif %}">
+                        <span class="lang-flag">🇬🇧</span> English
+                    </a>
+                    <a href="{{ url_for('set_language', lang='de') }}"
+                        class="language-option {% if session.get('language') == 'de' %}current{% endif %}">
+                        <span class="lang-flag">🇩🇪</span> Deutsch
+                    </a>
+                    <a href="{{ url_for('set_language', lang='it') }}"
+                        class="language-option {% if session.get('language') == 'it' %}current{% endif %}">
+                        <span class="lang-flag">🇮🇹</span> Italiano
+                    </a>
+                    <a href="{{ url_for('set_language', lang='fr') }}"
+                        class="language-option {% if session.get('language') == 'fr' %}current{% endif %}">
+                        <span class="lang-flag">🇫🇷</span> Français
+                    </a>
+                    <a href="{{ url_for('set_language', lang='zh') }}"
+                        class="language-option {% if session.get('language') == 'zh' %}current{% endif %}">
+                        <span class="lang-flag">🇨🇳</span> 中文
+                    </a>
+                </div>
+            </div>
 
             <div class="user-panel" id="userPanel">
                 {% if session.user_id %}
                 {% if session.role == 'admin' %}
-                <a href="{{ url_for('profile') }}">Админ-панель</a>
+                <a href="{{ url_for('profile') }}">{{ t('admin_panel') }}</a>
+                {% elif session.role == 'staff' or session.role == 'staff_pending' %}
+                <a href="/staff/profile">{{ t('profile') }}</a>
                 {% else %}
-                <a href="{{ url_for('profile') }}">Личный кабинет</a>
+                <a href="{{ url_for('profile') }}">{{ t('profile') }}</a>
                 {% endif %}
-                <a href="{{ url_for('logout') }}">Выход</a>
+                <a href="{{ url_for('logout') }}">{{ t('logout') }}</a>
                 {% else %}
-                <a href="{{ url_for('login') }}">Вход</a>
-                <a href="{{ url_for('register') }}">Регистрация</a>
+                <a href="{{ url_for('login') }}">{{ t('login') }}</a>
+                <a href="{{ url_for('register') }}">{{ t('register') }}</a>
                 {% endif %}
             </div>
         </div>
@@ -365,21 +681,20 @@
     <section class="welcome">
         <div class="container welcome-container">
             <h1 class="welcome-title">
-                ARKONIX — создаём цифровые решения, которые приносят результат
+                {{ t('welcome_title') }}
             </h1>
             <p class="welcome-subtitle">
-                Мы разрабатываем ботов, AI-системы, веб-приложения и сайты, которые автоматизируют бизнес,
-                сокращают издержки и ускоряют рост.
+                {{ t('welcome_subtitle') }}
             </p>
             <p class="welcome-tagline">
-                Не просто код — продуманные технологии под реальные задачи.
+                {{ t('welcome_tagline') }}
             </p>
         </div>
     </section>
 
     <section class="about">
         <div class="container">
-            <h2>О нас</h2>
+            <h2>{{ t('about_title') }}</h2>
             <p>
                 ARKONIX — это независимая команда IT-разработчиков, создающая современные цифровые продукты для бизнеса,
                 стартапов и частных клиентов. Мы объединяем технологии, креатив и инженерное мышление, чтобы превращать
@@ -454,23 +769,23 @@
 
     <section class="achievements">
         <div class="container">
-            <h2>Наши достижения</h2>
+            <h2>{{ t('achievements_title') }}</h2>
             <div class="achievements-grid">
                 <div class="achievement-card">
                     <h3>150+</h3>
-                    <p>Telegram-ботов</p>
+                    <p>{{ t('telegram_bots') }}</p>
                 </div>
                 <div class="achievement-card">
                     <h3>75+</h3>
-                    <p>AI-решений</p>
+                    <p>{{ t('ai_solutions') }}</p>
                 </div>
                 <div class="achievement-card">
                     <h3>120+</h3>
-                    <p>Приложений</p>
+                    <p>{{ t('applications') }}</p>
                 </div>
                 <div class="achievement-card">
                     <h3>200+</h3>
-                    <p>Сайтов</p>
+                    <p>{{ t('websites') }}</p>
                 </div>
             </div>
         </div>
@@ -478,7 +793,7 @@
 
     <section class="reviews">
         <div class="container">
-            <h2>Отзывы клиентов</h2>
+            <h2>{{ t('reviews_title') }}</h2>
             {% for r in reviews %}
             <div class="review-card">
                 <h4>{{ r[0] }}</h4>
@@ -491,28 +806,27 @@
             {% endfor %}
 
             {% if not reviews %}
-            <p>Пока отзывов нет.</p>
+            <p>{{ t('no_reviews') }}</p>
             {% endif %}
         </div>
     </section>
 
-    <!-- ВАЖНО: Добавлен id="reviews" для якоря -->
     <section class="add-review" id="reviews">
         <div class="container add-review-grid">
             <div class="review-form">
-                <h2>Оставить отзыв</h2>
+                <h2>{{ t('leave_review') }}</h2>
                 <form method="post" action="{{ url_for('add_review') }}">
-                    <input name="name" placeholder="Имя" required>
+                    <input name="name" placeholder="{{ t('name') }}" required>
                     <select name="rating" required>
-                        <option value="">⭐ Выберите оценку</option>
-                        <option value="5">⭐⭐⭐⭐⭐ Отлично!</option>
-                        <option value="4">⭐⭐⭐⭐ Хорошо</option>
-                        <option value="3">⭐⭐⭐ Нормально</option>
-                        <option value="2">⭐⭐ Плохо</option>
-                        <option value="1">⭐ Ужасно</option>
+                        <option value="">{{ t('select_rating') }}</option>
+                        <option value="5">{{ t('excellent') }}</option>
+                        <option value="4">{{ t('good') }}</option>
+                        <option value="3">{{ t('normal') }}</option>
+                        <option value="2">{{ t('bad') }}</option>
+                        <option value="1">{{ t('terrible') }}</option>
                     </select>
-                    <textarea name="comment" placeholder="Ваш отзыв" required></textarea>
-                    <button type="submit">Отправить</button>
+                    <textarea name="comment" placeholder="{{ t('your_review') }}" required></textarea>
+                    <button type="submit">{{ t('submit') }}</button>
                 </form>
             </div>
 
@@ -550,22 +864,23 @@
     <footer class="footer">
         <div class="container footer-container">
             <div class="footer-section">
-                <h4>Контакты</h4>
+                <h4>{{ t('contacts') }}</h4>
                 <p>Телефон: +38 095 713 66 14</p>
                 <p>Email: itw23265@gmail.com</p>
             </div>
             <div class="footer-section">
-                <h4>Соцсети</h4>
+                <h4>{{ t('social_networks') }}</h4>
                 <a href="https://t.me/worldit23">Telegram</a><br>
                 <a href="https://discord.gg/uKzRMmshnp">Discord</a>
             </div>
             <div class="footer-section">
-                <a href="{{ url_for('terms') }}">Условия использования</a>
-                <a href="{{ url_for('privacy') }}">Политика и правила</a>
+                <a href="{{ url_for('terms') }}">{{ t('terms') }}</a>
+                <a href="{{ url_for('privacy') }}">{{ t('privacy') }}</a>
+                <a href="{{ url_for('offer')}}">Публічна оферта</a>
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2025 ARKONIX. Все права защищены.
+            &copy; 2025 ARKONIX. {{ t('rights_reserved') }}.
         </div>
     </footer>
 
@@ -575,33 +890,68 @@
             const nav = document.getElementById('nav');
             const userPanel = document.getElementById('userPanel');
             const menuOverlay = document.getElementById('menuOverlay');
+            const langBtn = document.getElementById('langBtn');
+            const langDropdown = document.getElementById('langDropdown');
 
-            if (!burgerMenu) return;
+            // Переключатель языков
+            if (langBtn && langDropdown) {
+                langBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    langDropdown.classList.toggle('active');
+                });
 
-            function toggleMenu() {
-                burgerMenu.classList.toggle('active');
-                nav.classList.toggle('active');
-                if (userPanel) userPanel.classList.toggle('active');
-                menuOverlay.classList.toggle('active');
-                document.body.style.overflow = burgerMenu.classList.contains('active') ? 'hidden' : '';
+                // Закрытие при клике вне меню
+                document.addEventListener('click', function (e) {
+                    if (!langBtn.contains(e.target) && !langDropdown.contains(e.target)) {
+                        langDropdown.classList.remove('active');
+                    }
+                });
             }
 
-            burgerMenu.addEventListener('click', toggleMenu);
-            menuOverlay.addEventListener('click', toggleMenu);
+            // Бургер-меню
+            if (burgerMenu) {
+                function toggleMenu() {
+                    const isActive = burgerMenu.classList.contains('active');
 
-            nav.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 968) {
+                    burgerMenu.classList.toggle('active');
+                    nav.classList.toggle('active');
+                    if (userPanel) userPanel.classList.toggle('active');
+                    menuOverlay.classList.toggle('active');
+
+                    // Блокировка прокрутки
+                    document.body.style.overflow = !isActive ? 'hidden' : '';
+                }
+
+                burgerMenu.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    toggleMenu();
+                });
+
+                menuOverlay.addEventListener('click', toggleMenu);
+
+                // Закрытие при клике на навигационные ссылки
+                nav.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth <= 968) {
+                            toggleMenu();
+                        }
+                    });
+                });
+
+                // Закрытие при изменении размера экрана
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 968 && burgerMenu.classList.contains('active')) {
                         toggleMenu();
                     }
                 });
-            });
 
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 968 && burgerMenu.classList.contains('active')) {
-                    toggleMenu();
-                }
-            });
+                // Закрытие по ESC
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && burgerMenu.classList.contains('active')) {
+                        toggleMenu();
+                    }
+                });
+            }
         });
     </script>
 
