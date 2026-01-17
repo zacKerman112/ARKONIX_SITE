@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ session.get('language', 'uk') }}">
-{% extends "base.html" %}
-{% block title %}ARKONIX - {{ t('welcome_title') }}{% endblock %}
-{% block content %}
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -191,6 +189,7 @@
 
         /* ========== УЛУЧШЕННОЕ БУРГЕР-МЕНЮ ========== */
         .burger-menu {
+            margin-top: 20px;
             display: none;
             flex-direction: column;
             justify-content: center;
